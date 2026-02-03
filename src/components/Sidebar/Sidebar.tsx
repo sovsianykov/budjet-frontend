@@ -8,6 +8,7 @@ import RedeemIcon from '@mui/icons-material/Redeem';
 import LogoutIcon from "@mui/icons-material/Logout";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
 import {useAuth} from "@/hooks/useAuth";
 import {useRouter} from "next/navigation";
 import Link from "next/link";
@@ -53,7 +54,7 @@ export default function Sidebar() {
                 <Link href={'/transactions'}>
                     <ListItemButton>
                         <ListItemIcon>
-                            <MoreVertIcon className="text-white"/>
+                            <RequestQuoteIcon className="text-white"/>
                         </ListItemIcon>
                         <ListItemText primary="Transactions" />
                     </ListItemButton>

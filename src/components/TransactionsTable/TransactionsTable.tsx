@@ -24,9 +24,9 @@ export const TransactionsTable = () => {
         fetchTransactions();
     }, [fetchTransactions]);
 
-    if (loading) return <Typography>Loading...</Typography>;
-    if (error) return <Typography color="error">Error: {error.message}</Typography>;
-    if (!transactions?.length) return <Typography>No transactions found</Typography>;
+    if (loading) return <Typography color='white'>Loading...</Typography>;
+    // if (error) return <Typography color="error">Error: {error.message}</Typography>;
+    if (!transactions?.length) return <Typography color='white'>No transactions found</Typography>;
 
     const calculateTotal = (tx: typeof transactions[0]) =>
         tx.items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
@@ -36,7 +36,7 @@ export const TransactionsTable = () => {
             const totalPrice = calculateTotal(tx);
 
             return (
-                <Paper key={tx.id} sx={{ mb: 2, p: 2 }}>
+                <Paper key={tx.id} sx={{ mb: 2, p: 2 }} className="w-[200px\\]">
                     {/* Mobile card view */}
                     <Box display={{ xs: "block", sm: "none" }}>
                         <Stack spacing={1}>
@@ -115,7 +115,7 @@ export const TransactionsTable = () => {
                 </Paper>
             );
         });
-    }, [transactions]);
+    }, [calculateTotal, transactions]);
 
     return <Box>{transactionsElements}</Box>;
 };

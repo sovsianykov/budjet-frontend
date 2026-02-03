@@ -6,11 +6,11 @@ import Sidebar from "@/components/Sidebar/Sidebar";
 
 export default function TransactionsPage() {
     return (
-        <Box display="flex" color='gray' bgcolor='white'>
+        <Box display="flex" color='gray'  width='100%' >
             <Sidebar/>
-            <Box component="main" sx={{flexGrow: 1, p: 3}}>
+            <div  className='bg-blue-900 w-full min-h-screen md:ml-[240px] color-white'>
                 <TransactionsTable/>
-            </Box>
+            </div>
         </Box>
     )
 }
