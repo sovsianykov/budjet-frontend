@@ -3,9 +3,9 @@ import { config } from "@/config/config";
 
 export async function apiRequest<T>(
     endpoint: string,
-    body: object,
+    body?: Partial<object>,
     tokens?: Tokens,
-    method: "POST" | "GET" | "PUT" | "DELETE" = "POST"
+    method: "POST" | "GET" | "PUT" | "DELETE" | "PATCH" = "POST"
 ): Promise<T> {
     const headers: Record<string, string> = { "Content-Type": "application/json" };
 

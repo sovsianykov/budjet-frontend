@@ -20,68 +20,94 @@ const getInitialTokens = (): Tokens | null => {
 export function useAuth() {
     const [tokens, setTokens] = useState<Tokens | null>(getInitialTokens);
     const [user, setUser] = useState<User | null>(null);
-    const [isLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     // 🔐 LOGIN
     const login = async (email: string, password: string) => {
-        const data = await apiRequest<{
-            user: User;
-            accessToken: string;
-            refreshToken: string;
-        }>("/auth/sign_in", { email, password });
+        setIsLoading(true);
+        try {
+            const data = await apiRequest<{
+                user: User;
+                accessToken: string;
+                refreshToken: string;
+            }>("/auth/sign_in", { email, password });
 
-        const tokens = {
-            accessToken: data.accessToken,
-            refreshToken: data.refreshToken,
-        };
+            const tokens = {
+                accessToken: data.accessToken,
+                refreshToken: data.refreshToken,
+            };
 
-        localStorage.setItem(config.storageKey, JSON.stringify(tokens));
-        setTokens(tokens);
-        setUser(data.user);
+            localStorage.setItem(config.storageKey, JSON.stringify(tokens));
+            setTokens(tokens);
+            setUser(data.user);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     // 📝 REGISTER
     const register = async (payload: RegisterPayload) => {
-        const data = await apiRequest<{
-            user: User;
-            accessToken: string;
-            refreshToken: string;
-        }>("/auth/sign_up", payload);
+        setIsLoading(true);
+        try {
+            const data = await apiRequest<{
+                user: User;
+                accessToken: string;
+                refreshToken: string;
+            }>("/auth/sign_up", payload);
 
-        const tokens = {
-            accessToken: data.accessToken,
-            refreshToken: data.refreshToken,
-        };
+            const tokens = {
+                accessToken: data.accessToken,
+                refreshToken: data.refreshToken,
+            };
 
-        localStorage.setItem(config.storageKey, JSON.stringify(tokens));
-        setTokens(tokens);
-        setUser(data.user);
+            localStorage.setItem(config.storageKey, JSON.stringify(tokens));
+            setTokens(tokens);
+            setUser(data.user);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-        return {
-            user,
-            tokens,
-            login,
-            register,
-            logout,
-            refresh,
-            isAuthenticated: !!user,
-        };
+    // 👤 CURRENT USER (SESSION RESTORE)
+    const me = async (): Promise<User | null> => {
+        if (!tokens?.accessToken) return null;
+
+        setIsLoading(true);
+        try {
+            const userData = await apiRequest<User>("/auth/me", {}, tokens);
+            setUser(userData);
+            console.log('userData',userData);
+
+            return userData;
+        } catch {
+            // token invalid / expired
+            setUser(null);
+            setTokens(null);
+            localStorage.removeItem(config.storageKey);
+            return null;
+        } finally {
+            setIsLoading(false);
+        }
+
+        console.log()
     };
 
     // 🗑 DELETE ACCOUNT
     const deleteAccount = async () => {
         if (!tokens) throw new Error("Not authenticated");
-
         await apiRequest("/auth/delete", {}, tokens);
-
         logout();
     };
 
-    // 🔄 REFRESH
+    // 🔄 REFRESH TOKEN
     const refresh = async () => {
-        if (!tokens) throw new Error("No refresh token");
+        if (!tokens?.refreshToken) throw new Error("No refresh token");
 
-        const newTokens = await apiRequest<Tokens>("/auth/refresh", {}, tokens);
+        const newTokens = await apiRequest<Tokens>(
+            "/auth/refresh",
+            { token: tokens.refreshToken },
+            tokens
+        );
 
         localStorage.setItem(config.storageKey, JSON.stringify(newTokens));
         setTokens(newTokens);
@@ -101,6 +127,7 @@ export function useAuth() {
         isLoading,
         login,
         register,
+        me,
         deleteAccount,
         refresh,
         logout,

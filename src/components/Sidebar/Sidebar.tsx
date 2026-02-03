@@ -4,10 +4,13 @@ import { useState } from "react";
 import { Box, Drawer, List, ListItemButton, ListItemIcon, ListItemText, IconButton, Toolbar } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import HomeIcon from "@mui/icons-material/Home";
+import RedeemIcon from '@mui/icons-material/Redeem';
 import LogoutIcon from "@mui/icons-material/Logout";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import {useAuth} from "@/hooks/useAuth";
 import {useRouter} from "next/navigation";
+import Link from "next/link";
 
 const drawerWidth = 240;
 
@@ -29,18 +32,41 @@ export default function Sidebar() {
         <Box onClick={handleDrawerToggle} sx={{ textAlign: "center", color: "white", backgroundColor: "purple" , height: "100vh"}}>
             <Toolbar />
             <List>
+                <Link href={'/dashboard'}>
                 <ListItemButton>
                     <ListItemIcon>
                         <HomeIcon className="text-white"/>
                     </ListItemIcon>
                     <ListItemText primary="Dashboard" />
                 </ListItemButton>
+                </Link>
+
+                <Link href={'/products'}>
+                    <ListItemButton>
+                        <ListItemIcon>
+                            <RedeemIcon  className="text-white"/>
+                        </ListItemIcon>
+                        <ListItemText primary="Products" />
+                    </ListItemButton>
+                </Link>
+
+                <Link href={'/transactions'}>
+                    <ListItemButton>
+                        <ListItemIcon>
+                            <MoreVertIcon className="text-white"/>
+                        </ListItemIcon>
+                        <ListItemText primary="Transactions" />
+                    </ListItemButton>
+                </Link>
+
+                <Link href={'/profile'}>
                 <ListItemButton>
                     <ListItemIcon>
                         <AccountCircleIcon  className="text-white"/>
                     </ListItemIcon>
                     <ListItemText primary="Profile" />
                 </ListItemButton>
+                </Link>
                 <Box sx={{ mt: "auto" }}>
                     <List>
                         <ListItemButton onClick={handleLogout}>
@@ -57,7 +83,6 @@ export default function Sidebar() {
 
     return (
         <>
-            {/* Кнопка для мобильного меню */}
             <IconButton
                 color="inherit"
                 aria-label="open drawer"
@@ -68,7 +93,6 @@ export default function Sidebar() {
                 <MenuIcon className='text-purple-900' />
             </IconButton>
 
-            {/* Мобильный Drawer */}
             <Drawer
                 variant="temporary"
                 open={mobileOpen}
