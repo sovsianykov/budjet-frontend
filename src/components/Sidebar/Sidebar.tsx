@@ -30,7 +30,7 @@ export default function Sidebar() {
     };
 
     const drawerContent = (
-        <Box onClick={handleDrawerToggle} sx={{ textAlign: "center", color: "white", backgroundColor: "purple" , height: "100vh"}}>
+        <Box onClick={handleDrawerToggle} sx={{ textAlign: "center", color: "white", backgroundColor: "#1976D2" , height: "100vh"}}>
             <Toolbar />
             <List>
                 <Link href={'/dashboard'}>
@@ -88,6 +88,7 @@ export default function Sidebar() {
                 color="inherit"
                 aria-label="open drawer"
                 edge="start"
+                className='absolute! top-0 left-0 z-10 '
                 onClick={handleDrawerToggle}
                 sx={{ m: 1, display: { sm: "none" } }}
             >

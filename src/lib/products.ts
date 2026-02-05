@@ -5,8 +5,6 @@ import { getErrorMessage } from '@/utils/utils';
 
 const PRODUCTS_ENDPOINT = '/products';
 
-/**
- */
 async function safeRequest<T>(promise: Promise<T>): Promise<T> {
     try {
         return await promise;

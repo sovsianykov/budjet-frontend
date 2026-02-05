@@ -62,8 +62,11 @@ export function useProducts({ tokens, autoLoad = true }: UseProductsOptions = {}
                     prev.map((p) => (p.id === id ? updated : p))
                 );
                 return updated;
-            } catch (e: any) {
-                setError(e.message);
+            } catch (e: unknown) {
+                const err = e
+                if (err instanceof Error) {
+                    setError(err.message);
+                }
                 throw e;
             } finally {
                 setLoading(false);

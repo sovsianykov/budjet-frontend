@@ -8,7 +8,7 @@ export interface Order {
   }
 
 export type Product  = {
-    id  ?        : string;
+    id        : string;
     productName : string;
     price       : number;
     createdAt  : Date;
@@ -42,4 +42,21 @@ export interface Transaction {
     createdAt: string;
     updatedAt: string;
     items: TransactionItem[];
+}
+
+export interface PageParamsWithLang<T = {}> {
+    params: {
+        lang: string;
+    } & T;
+    searchParams: {
+        [key: string]: string;
+    };
+}
+export interface PageParamsWithSlug {
+    params: {
+        slug: string;
+    };
+    searchParams: {
+        [key: string]: string;
+    };
 }

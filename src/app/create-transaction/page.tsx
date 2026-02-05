@@ -13,7 +13,9 @@ export default function CreateTransactionPage() {
     return (
         <Box display="flex" color='gray' bgcolor='white'>
             <Sidebar/>
-             <CreateTransactionForm products={mockProducts}/>
+            <div>
+                <CreateTransactionForm products={mockProducts}/>
+            </div>
         </Box>
     )
 }
