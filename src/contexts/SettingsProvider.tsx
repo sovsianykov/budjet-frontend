@@ -35,7 +35,6 @@ interface ISettingsProvider {
 export const SettingsProvider = ({ children, settings, lang }: ISettingsProvider) => {
     const contentfulSettings: ISettings = useMemo(() => createSettingsObject(settings) as ISettings, [settings]);
 
-    console.log(settings)
 
 
     const getLabel = useMemo(() => {

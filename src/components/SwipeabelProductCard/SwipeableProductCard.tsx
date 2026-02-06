@@ -105,13 +105,15 @@ export default function SwipeableProductCard({
                 dragConstraints={{ left: -DISMISS_OFFSET, right: DISMISS_OFFSET }}
                 onDragEnd={handleDragEnd}
             >
-                <Card sx={{  height: "100%", boxShadow: "xl" }} className='shadow-xl'>
+                <Card sx={{  height: "100%", boxShadow: "xl",  border: "2px 5px 10px black", }} className='shadow-xl'>
                     <CardContent
                         sx={{
                             display: "flex",
                             justifyContent: "space-between",
                             alignItems: "center",
                             height: "100%",
+
+
                         }}
                     >
                         <Typography fontWeight={500}>

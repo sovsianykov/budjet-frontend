@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { Box, Drawer, List, ListItemButton, ListItemIcon, ListItemText, IconButton, Toolbar } from "@mui/material";
+import {useState} from "react";
+import {Box, Drawer, List, ListItemButton, ListItemIcon, ListItemText, IconButton, Toolbar} from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import HomeIcon from "@mui/icons-material/Home";
 import RedeemIcon from '@mui/icons-material/Redeem';
 import LogoutIcon from "@mui/icons-material/Logout";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
+import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
 import {useAuth} from "@/hooks/useAuth";
@@ -21,7 +21,7 @@ export default function Sidebar() {
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
     };
-    const { logout } = useAuth();
+    const {logout} = useAuth();
     const router = useRouter();
 
     const handleLogout = () => {
@@ -30,51 +30,50 @@ export default function Sidebar() {
     };
 
     const drawerContent = (
-        <Box onClick={handleDrawerToggle} sx={{ textAlign: "center", color: "white", backgroundColor: "#1976D2" , height: "100vh"}}>
-            <Toolbar />
+        <Box onClick={handleDrawerToggle}
+             sx={{textAlign: "center", color: "white", backgroundColor: "#1976D2", height: "100vh"}}>
+            <Toolbar/>
             <List>
-                <Link href={'/dashboard'}>
-                <ListItemButton>
+                <ListItemButton component={Link} href="/dashboard">
                     <ListItemIcon>
                         <HomeIcon className="text-white"/>
                     </ListItemIcon>
-                    <ListItemText primary="Dashboard" />
+                    <ListItemText primary="Dashboard"/>
                 </ListItemButton>
-                </Link>
 
-                <Link href={'/products'}>
-                    <ListItemButton>
-                        <ListItemIcon>
-                            <RedeemIcon  className="text-white"/>
-                        </ListItemIcon>
-                        <ListItemText primary="Products" />
-                    </ListItemButton>
-                </Link>
-
-                <Link href={'/transactions'}>
-                    <ListItemButton>
-                        <ListItemIcon>
-                            <RequestQuoteIcon className="text-white"/>
-                        </ListItemIcon>
-                        <ListItemText primary="Transactions" />
-                    </ListItemButton>
-                </Link>
-
-                <Link href={'/profile'}>
-                <ListItemButton>
+                <ListItemButton component={Link} href="/en/products">
                     <ListItemIcon>
-                        <AccountCircleIcon  className="text-white"/>
+                        <RedeemIcon className="text-white"/>
                     </ListItemIcon>
-                    <ListItemText primary="Profile" />
+                    <ListItemText primary="Products"/>
                 </ListItemButton>
-                </Link>
-                <Box sx={{ mt: "auto" }}>
+
+                <ListItemButton component={Link} href="/en/create-product">
+                    <ListItemIcon>
+                        <ShoppingBasketIcon className="text-white"/>
+                    </ListItemIcon>
+                    <ListItemText primary="Create Product"/>
+                </ListItemButton>
+
+                <ListItemButton component={Link} href="/en/transactions">
+                    <ListItemIcon>
+                        <RequestQuoteIcon className="text-white"/>
+                    </ListItemIcon><ListItemText primary="Transactions"/></ListItemButton>
+
+                <ListItemButton component={Link} href="/profile">
+                    <ListItemIcon>
+                        <AccountCircleIcon className="text-white"/>
+                    </ListItemIcon>
+                    <ListItemText primary="Profile"/>
+                </ListItemButton>
+
+                <Box sx={{mt: "auto"}}>
                     <List>
                         <ListItemButton onClick={handleLogout}>
                             <ListItemIcon>
-                                <LogoutIcon  className="text-white"/>
+                                <LogoutIcon className="text-white"/>
                             </ListItemIcon>
-                            <ListItemText primary="Logout" />
+                            <ListItemText primary="Logout"/>
                         </ListItemButton>
                     </List>
                 </Box>
@@ -90,19 +89,19 @@ export default function Sidebar() {
                 edge="start"
                 className='absolute! top-0 left-0 z-10 '
                 onClick={handleDrawerToggle}
-                sx={{ m: 1, display: { sm: "none" } }}
+                sx={{m: 1, display: {sm: "none"}}}
             >
-                <MenuIcon className='text-purple-900' />
+                <MenuIcon className='text-purple-900'/>
             </IconButton>
 
             <Drawer
                 variant="temporary"
                 open={mobileOpen}
                 onClose={handleDrawerToggle}
-                ModalProps={{ keepMounted: true }}
+                ModalProps={{keepMounted: true}}
                 sx={{
-                    display: { xs: "block", sm: "none" },
-                    "& .MuiDrawer-paper": { boxSizing: "border-box", width: drawerWidth },
+                    display: {xs: "block", sm: "none"},
+                    "& .MuiDrawer-paper": {boxSizing: "border-box", width: drawerWidth},
                 }}
             >
                 {drawerContent}
@@ -111,8 +110,8 @@ export default function Sidebar() {
             <Drawer
                 variant="permanent"
                 sx={{
-                    display: { xs: "none", sm: "block" },
-                    "& .MuiDrawer-paper": { boxSizing: "border-box", width: drawerWidth },
+                    display: {xs: "none", sm: "block"},
+                    "& .MuiDrawer-paper": {boxSizing: "border-box", width: drawerWidth},
                 }}
                 open
             >

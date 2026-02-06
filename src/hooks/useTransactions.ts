@@ -62,6 +62,8 @@ export function useTransactions(options?: UseTransactionsOptions) {
     // Create a transaction
     const createTransactionHandler = useCallback(
         async (data: CreateTransactionInput) => {
+            console.log(data)
+
             setLoading(true);
             setError(null);
             try {

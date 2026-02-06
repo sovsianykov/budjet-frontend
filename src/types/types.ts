@@ -11,8 +11,8 @@ export type Product  = {
     id        : string;
     productName : string;
     price       : number;
-    createdAt  : Date;
-    updatedAt   : Date;
+    createdAt?  : Date;
+    updatedAt?   : Date;
 }
 
 export interface TransactionItemInput {

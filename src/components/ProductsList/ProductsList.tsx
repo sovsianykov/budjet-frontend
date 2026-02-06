@@ -1,7 +1,6 @@
 "use client";
 
 import { useSettingsContext } from "@/contexts/SettingsProvider";
-import { useProducts } from "@/hooks/useProducts";
 import {ArrowBack} from "@mui/icons-material"
 import {ArrowForward} from "@mui/icons-material"
 import {
@@ -11,15 +10,22 @@ import {
     CircularProgress,
 } from "@mui/material";
 import SwipeableProductCard from "@/components/SwipeabelProductCard/SwipeableProductCard";
+import {Product} from "@/types/types";
 
-const ProductsList = () => {
+type ProductsListProps = {
+    products: Product[];
+    loading: boolean;
+    error: string | null;
+    onDelete: (id: string) => void;
+};
+
+export default function ProductsList({ products, loading, error, onDelete }: ProductsListProps) {
     const { getLabelsForCommonKey } = useSettingsContext();
     const { product, price } = getLabelsForCommonKey("productList", [
         "product",
         "price",
     ]);
 
-    const { products, loading, error } = useProducts();
 
     if (loading)
         return (
@@ -35,8 +41,7 @@ const ProductsList = () => {
             </Typography>
         );
     const handleDelete = (id: string) => {
-        console.log("Delete product", id);
-
+       onDelete(id);
     };
 
     const handleAddToCart = (id: string) => {
@@ -67,7 +72,7 @@ const ProductsList = () => {
             </Stack>
 
             {/* Product cards */}
-            <Stack spacing={2}>
+            <Stack spacing={2} flexDirection="column-reverse">
                 {products.map((item) => (
                     <SwipeableProductCard
                         key={item.id}
@@ -81,4 +86,3 @@ const ProductsList = () => {
     );
 };
 
-export default ProductsList;

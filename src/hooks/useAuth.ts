@@ -1,24 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { apiRequest } from "@/lib/api";
 import { Tokens, User, RegisterPayload } from "@/types/auth";
 import { config } from "@/config/config";
 
+const STORAGE_KEY = config.storageKey;
+
 const getInitialTokens = (): Tokens | null => {
     if (typeof window === "undefined") return null;
-
     try {
-        const stored = localStorage.getItem(config.storageKey);
+        const stored = localStorage.getItem(STORAGE_KEY);
         return stored ? JSON.parse(stored) : null;
     } catch {
-        localStorage.removeItem(config.storageKey);
+        localStorage.removeItem(STORAGE_KEY);
         return null;
     }
 };
 
+const getInitialUserId = (): string | null => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem(`${STORAGE_KEY}-userId`);
+};
+
 export function useAuth() {
     const [tokens, setTokens] = useState<Tokens | null>(getInitialTokens);
+    const [userId, setUserId] = useState<string | null>(getInitialUserId);
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -37,8 +44,11 @@ export function useAuth() {
                 refreshToken: data.refreshToken,
             };
 
-            localStorage.setItem(config.storageKey, JSON.stringify(tokens));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(tokens));
+            localStorage.setItem(`${STORAGE_KEY}-userId`, data.user.id);
+
             setTokens(tokens);
+            setUserId(data.user.id);
             setUser(data.user);
         } finally {
             setIsLoading(false);
@@ -60,8 +70,11 @@ export function useAuth() {
                 refreshToken: data.refreshToken,
             };
 
-            localStorage.setItem(config.storageKey, JSON.stringify(tokens));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(tokens));
+            localStorage.setItem(`${STORAGE_KEY}-userId`, data.user.id);
+
             setTokens(tokens);
+            setUserId(data.user.id);
             setUser(data.user);
         } finally {
             setIsLoading(false);
@@ -76,27 +89,29 @@ export function useAuth() {
         try {
             const userData = await apiRequest<User>("/auth/me", {}, tokens);
             setUser(userData);
-            console.log('userData',userData);
-
+            setUserId(userData.id);
+            localStorage.setItem(`${STORAGE_KEY}-userId`, userData.id);
             return userData;
         } catch {
-            // token invalid / expired
+            // токен недействителен / истёк
             setUser(null);
             setTokens(null);
-            localStorage.removeItem(config.storageKey);
+            setUserId(null);
+            localStorage.removeItem(STORAGE_KEY);
+            localStorage.removeItem(`${STORAGE_KEY}-userId`);
             return null;
         } finally {
             setIsLoading(false);
         }
-
-        console.log()
     };
 
-    // 🗑 DELETE ACCOUNT
-    const deleteAccount = async () => {
-        if (!tokens) throw new Error("Not authenticated");
-        await apiRequest("/auth/delete", {}, tokens);
-        logout();
+    // 🚪 LOGOUT
+    const logout = () => {
+        setTokens(null);
+        setUser(null);
+        setUserId(null);
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(`${STORAGE_KEY}-userId`);
     };
 
     // 🔄 REFRESH TOKEN
@@ -109,27 +124,20 @@ export function useAuth() {
             tokens
         );
 
-        localStorage.setItem(config.storageKey, JSON.stringify(newTokens));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(newTokens));
         setTokens(newTokens);
-    };
-
-    // 🚪 LOGOUT
-    const logout = () => {
-        setTokens(null);
-        setUser(null);
-        localStorage.removeItem(config.storageKey);
     };
 
     return {
         user,
+        userId,
         tokens,
         isAuthenticated: !!user,
         isLoading,
         login,
         register,
         me,
-        deleteAccount,
-        refresh,
         logout,
+        refresh,
     };
 }

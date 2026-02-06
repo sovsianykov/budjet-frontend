@@ -5,6 +5,7 @@ import Sidebar from "@/components/Sidebar/Sidebar";
 
 
 export default function TransactionsPage() {
+
     return (
         <Box display="flex" color='gray'  width='100%' >
             <Sidebar/>
