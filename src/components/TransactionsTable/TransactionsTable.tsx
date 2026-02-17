@@ -1,45 +1,138 @@
 "use client";
 
-import React, { useEffect, useMemo } from "react";
-import Link from 'next/link'
 import {
+    Box,
+    Collapse,
+    IconButton,
+    Paper,
     Table,
     TableBody,
     TableCell,
     TableContainer,
     TableHead,
     TableRow,
-    Paper,
     Typography,
-    Box,
-    Stack,
-    Chip,
-    Divider,
 } from "@mui/material";
-import { useTransactions } from "@/hooks/useTransactions";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import { useState } from "react";
+import { Transaction } from "@/types/types";
+import {calculateTransactionTotal} from "@/utils/calculateTransactionTotal";
+import {useUsers} from "@/hooks/useUsers";
 
-export const TransactionsTable = () => {
-    const {transactions, loading, error, fetchTransactions} = useTransactions();
+type TransactionTableProps = {
+    transactions: Transaction[];
+};
 
-    useEffect(() => {
-        fetchTransactions();
-    }, [fetchTransactions]);
+type TransactionRowProps = {
+    transaction: Transaction;
+};
 
-    if (loading) return <Typography color='white'>Loading...</Typography>;
-    if (!transactions?.length) return <Box>
-        <Typography color='white'>No transactions found</Typography>
-        <Link href='/en/transactions/new' className='px-2 py-2 text-white'>
-            Create Transaction
-        </Link>
-    </Box>;
+const TransactionRow = ({ transaction }: TransactionRowProps) => {
+    const [open, setOpen] = useState(false);
 
-    const calculateTotal = (tx: typeof transactions[0]) =>
-        tx.items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+    const total = calculateTransactionTotal(transaction.items);
 
-    return (<div>
-        <Link href='/en/transactions/new' className='px-2 py-2 text-white'>
-            Create Transaction
-        </Link>
-    </div>)
+    const { getUserName }= useUsers()
 
-}
+
+    return (
+        <>
+            <TableRow
+                sx={{
+                    "&:nth-of-type(odd)": {
+                        backgroundColor: "action.hover",
+                    },
+                }}
+            >
+                <TableCell>
+                    <IconButton size="small" onClick={() => setOpen(!open)}>
+                        {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                    </IconButton>
+                </TableCell>
+
+                <TableCell>{getUserName(transaction.userId)}</TableCell>
+
+                <TableCell>
+                    {new Date(transaction.createdAt).toLocaleDateString()}
+                </TableCell>
+
+                <TableCell align="right">
+                    <strong>{total.toFixed(2)} hrv</strong>
+                </TableCell>
+            </TableRow>
+
+            <TableRow>
+                <TableCell colSpan={4} sx={{ p: 0 }}>
+                    <Collapse in={open} timeout="auto" unmountOnExit>
+                        <Box sx={{ p: 2 }}>
+                            <Typography variant="subtitle1" gutterBottom>
+                                Products
+                            </Typography>
+
+                            <Table size="small">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Product</TableCell>
+                                        <TableCell align="right">Price</TableCell>
+                                        <TableCell align="right">Quantity</TableCell>
+                                        <TableCell align="right">Subtotal</TableCell>
+                                    </TableRow>
+                                </TableHead>
+
+                                <TableBody>
+                                    {transaction.items.map((item) => {
+                                        const subtotal =
+                                            item.product.price * item.quantity;
+
+                                        return (
+                                            <TableRow key={item.id}>
+                                                <TableCell>{item.product.name}</TableCell>
+                                                <TableCell align="right">
+                                                    {item.product.price.toFixed(2)} hrv
+                                                </TableCell>
+                                                <TableCell align="right">
+                                                    {item.quantity}
+                                                </TableCell>
+                                                <TableCell align="right">
+                                                    {subtotal.toFixed(2)} hrv
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })}
+                                </TableBody>
+                            </Table>
+                        </Box>
+                    </Collapse>
+                </TableCell>
+            </TableRow>
+        </>
+    );
+};
+
+
+export const TransactionsTable = ({ transactions }: TransactionTableProps) => {
+    return (
+        <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 3 }}>
+            <Table>
+                <TableHead>
+                    <TableRow>
+                        <TableCell />
+                        <TableCell>User</TableCell>
+                        <TableCell>Date</TableCell>
+                        <TableCell align="right">Total</TableCell>
+                    </TableRow>
+                </TableHead>
+
+                <TableBody>
+                    {transactions.map((transaction) => (
+                        <TransactionRow
+                            key={transaction.id}
+                            transaction={transaction}
+                        />
+                    ))}
+                </TableBody>
+            </Table>
+        </TableContainer>
+    );
+};

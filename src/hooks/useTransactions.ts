@@ -1,5 +1,5 @@
-// hooks/useTransactions.ts
-import { useState, useEffect, useCallback } from 'react';
+"use client"
+import { useState, useCallback } from 'react';
 import {
     getTransactions,
     getTransactionById,
@@ -123,6 +123,8 @@ export function useTransactions(options?: UseTransactionsOptions) {
         },
         [tokens, transaction]
     );
+
+
 
     return {
         transactions,
