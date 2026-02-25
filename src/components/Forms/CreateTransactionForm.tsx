@@ -16,32 +16,36 @@ import { useTransactions } from "@/hooks/useTransactions";
 import { useProducts } from "@/hooks/useProducts";
 import { CreateTransactionInput } from "@/types/types";
 import { ProductSelectDropdown } from "../ProductSelectDropdown/ProductSelectDropdown";
-import {useAuth} from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/useAuth";
 
 export const CreateTransactionForm = () => {
-    const { createTransaction, transactions } = useTransactions();
+    const { createTransaction } = useTransactions();
     const { products } = useProducts();
-
-
     const { userId } = useAuth();
 
-    console.log(userId)
-
-    const { control, handleSubmit, reset } = useForm<CreateTransactionInput>({
-        defaultValues: {
-             userId: userId || "",
-            items: [{ productId: "", quantity: 1 }],
-        },
-    });
+    const { control, handleSubmit, reset, watch } =
+        useForm<CreateTransactionInput>({
+            defaultValues: {
+                userId: userId || "",
+                items: [{ productId: "", quantity: 1 }],
+            },
+        });
 
     const { fields, append, remove } = useFieldArray({
         control,
         name: "items",
     });
 
+    const watchedItems = watch("items");
 
     const onSubmit = async (data: CreateTransactionInput) => {
-        const items = data.items.filter(i => i.productId && i.quantity > 0);
+        const items = data.items
+            .filter(i => i.productId && i.quantity > 0)
+            .map(i => ({
+                ...i,
+                quantity: Number(i.quantity), // 🔥 конвертируем к числу
+            }));
+
         if (!items.length) {
             return alert("Please add at least one product with quantity > 0");
         }
@@ -52,8 +56,7 @@ export const CreateTransactionForm = () => {
         };
 
         try {
-            const response = await createTransaction(payload);
-            console.log("Created transaction:", response);
+            await createTransaction(payload);
             reset({
                 userId: data.userId,
                 items: [{ productId: "", quantity: 1 }],
@@ -65,75 +68,74 @@ export const CreateTransactionForm = () => {
     };
 
     return (
-        <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ p: 2 , pt: 10}}>
-            <Typography variant="h6">Create Transaction</Typography>
+        <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ p: 2, pt: 10 }}>
+            <Typography variant="h6" color="primary">
+                Create Transaction
+            </Typography>
 
             <Divider sx={{ my: 2 }} />
 
-            {fields.map((field, index) => (
-                <Stack
-                    key={field.id}
-                    direction="row"
-                    spacing={1}
-                    alignItems="center"
-                    sx={{ mb: 2 }}
-                >
-                    {/* Product select */}
-                    <ProductSelectDropdown
-                        control={control}
-                        name={`items.${index}.productId`}
-                        products={products}
-                    />
+            {fields.map((field, index) => {
+                const selectedProductIds = watchedItems
+                    ?.map((item, i) => (i === index ? null : item.productId))
+                    .filter(Boolean) ?? [];
 
-                    {/* Quantity */}
-                    <Controller
-                        name={`items.${index}.quantity`}
-                        control={control}
-                        rules={{ required: true, min: 1 }}
-                        render={({ field }) => (
-                            <TextField
-                                {...field}
-                                type="number"
-                                label="Qty"
-                                sx={{ width: 50 ,}}
-                            />
-                        )}
-                    />
+                const availableProducts = products.filter(
+                    (product) => !selectedProductIds.includes(product.id)
+                );
 
-                    {/* Remove */}
-                    <IconButton
-                        color="error"
-                        onClick={() => remove(index)}
-                        sx={{ width: 30 }}
-                        disabled={fields.length === 1}
+                return (
+                    <Stack
+                        key={field.id}
+                        direction="row"
+                        spacing={1}
+                        alignItems="flex-start"
+                        sx={{ mb: 2 }}
                     >
-                        <Remove />
-                    </IconButton>
-                </Stack>
-            ))}
+                        <ProductSelectDropdown
+                            control={control}
+                            name={`items.${index}.productId`}
+                            products={availableProducts}
+                        />
+
+                        <Controller
+                            name={`items.${index}.quantity`}
+                            control={control}
+                            rules={{ required: true, min: 1 }}
+                            render={({ field }) => (
+                                <TextField
+                                    {...field}
+                                    type="number"
+                                    label="Qty"
+                                    sx={{ width: 80 }}
+                                />
+                            )}
+                        />
+
+                        <IconButton
+                            color="error"
+                            onClick={() => remove(index)}
+                            sx={{ width: 30 }}
+                            disabled={fields.length === 1}
+                        >
+                            <Remove />
+                        </IconButton>
+                    </Stack>
+                );
+            })}
 
             <Button
                 startIcon={<Add />}
                 variant="outlined"
                 onClick={() => append({ productId: "", quantity: 1 })}
-                sx={{ mb: 2 , width:"100%" ,display: "inline-flex" }}
+                sx={{ mb: 2, width: "100%" }}
             >
                 Add item
             </Button>
 
-            <Button type="submit" variant="contained"  sx={{ mb: 2 , width:"100%" ,display: "inline-flex" }}>
+            <Button type="submit" variant="contained" sx={{ mb: 2, width: "100%" }}>
                 Create Transaction
             </Button>
-            <Box sx={{ flexDirection: "column" , flexGrow: 1 }}>
-                {transactions && transactions.map((transaction) => (
-                    transaction.items.map((item) => (
-                        <div key={item.productId}>
-                            {item.product.name}
-                        </div>
-                    ))
-                ))}
-
-            </Box>
         </Box>
     );
 };

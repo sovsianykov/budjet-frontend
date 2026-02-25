@@ -1,8 +1,8 @@
 import React from "react";
-import { Controller, Control } from "react-hook-form";
-import { TextField, MenuItem } from "@mui/material";
-import { Product } from "@/types/types";
-import { CreateTransactionInput } from "@/types/types";
+import {Controller, Control} from "react-hook-form";
+import {TextField, MenuItem} from "@mui/material";
+import {Product} from "@/types/types";
+import {CreateTransactionInput} from "@/types/types";
 
 type Props = {
     control: Control<CreateTransactionInput>;
@@ -10,24 +10,20 @@ type Props = {
     products: Product[];
 };
 
-export const ProductSelectDropdown = ({
-                                           control,
-                                           name,
-                                           products,
-                                       }: Props) => {
+export const ProductSelectDropdown = ({control, name, products,}: Props) => {
     return (
         <Controller
             name={name}
             control={control}
-            rules={{ required: "Product is required" }}
-            render={({ field, fieldState }) => (
+            rules={{required: "Product is required"}}
+            render={({field, fieldState}) => (
                 <TextField
                     {...field}
                     select
-                    label="Product"
+                    label="Enter a product name"
                     error={!!fieldState.error}
                     helperText={fieldState.error?.message}
-                    sx={{ flex: 1 }}
+                    sx={{flex: 1, color: "#bdbdbd"}}
                 >
                     {products.map((product) => (
                         <MenuItem key={product.id} value={product.id}>

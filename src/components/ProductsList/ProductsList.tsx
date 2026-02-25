@@ -9,17 +9,17 @@ import {
     Stack,
     CircularProgress,
 } from "@mui/material";
-import SwipeableProductCard from "@/components/SwipeabelProductCard/SwipeableProductCard";
+import SwipeableProductRow from "@/components/SwipeabelProductCard/SwipeableProductRow";
 import {Product} from "@/types/types";
 
 type ProductsListProps = {
     products: Product[];
     loading: boolean;
     error: string | null;
-    onDelete: (id: string) => void;
+    onDeleteAction: (id: string) => void;
 };
 
-export default function ProductsList({ products, loading, error, onDelete }: ProductsListProps) {
+export default function ProductsList({ products, loading, error, onDeleteAction }: ProductsListProps) {
     const { getLabelsForCommonKey } = useSettingsContext();
     const { product, price } = getLabelsForCommonKey("productList", [
         "product",
@@ -41,7 +41,7 @@ export default function ProductsList({ products, loading, error, onDelete }: Pro
             </Typography>
         );
     const handleDelete = (id: string) => {
-       onDelete(id);
+       onDeleteAction(id);
     };
 
     const handleAddToCart = (id: string) => {
@@ -63,7 +63,7 @@ export default function ProductsList({ products, loading, error, onDelete }: Pro
                 sx={{ mb: 2, px: 1 }}
             >
                 <Typography variant="subtitle1"  color="primary">
-                   <ArrowBack className='text-blue-500 gap-3 items-center flex font-semibold' /> archive
+                   <ArrowBack className='text-blue-500 gap-3 items-center flex font-semibold' /> hide
                 </Typography>
                 <Typography variant="subtitle1" className='text-red-500 flex items-center gap-2'>
                     remove
@@ -72,14 +72,14 @@ export default function ProductsList({ products, loading, error, onDelete }: Pro
             </Stack>
 
             {/* Product cards */}
-            <Stack spacing={2} flexDirection="column-reverse">
+            <Stack spacing={0} flexDirection="column-reverse">
                 {products.map((item) => (
-                    <SwipeableProductCard
-                        key={item.id}
-                        product={item}
-                        onDelete={handleDelete}
-                        onAddToCart={handleAddToCart}
-                    />
+                        <SwipeableProductRow
+                            key={item.id}
+                            product={item}
+                            onDeleteAction={handleDelete}
+                            onAddToCartAction={handleAddToCart}
+                        />
                 ))}
                   </Stack>
         </Box>

@@ -31,7 +31,7 @@ export interface TransactionItem {
     quantity: number;
     product: {
         id: string;
-        name: string;
+        productName: string;
         price: number;
     };
 }

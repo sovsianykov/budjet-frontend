@@ -49,7 +49,7 @@ export default function CreateProductForm({ onAddProduct }: CreateProductFormPro
                 control={control}
                 rules={{ required: "Product name is required" }}
                 render={({ field }) => (
-                    <TextField {...field} label="Product" fullWidth error={!!errors.productName} helperText={errors.productName?.message} />
+                    <TextField {...field} label="Enter a product name" fullWidth error={!!errors.productName} helperText={errors.productName?.message} />
                 )}
             />
 

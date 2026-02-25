@@ -91,7 +91,7 @@ export default function Sidebar() {
                 onClick={handleDrawerToggle}
                 sx={{m: 1, display: {sm: "none"}}}
             >
-                <MenuIcon className='text-purple-900'/>
+                <MenuIcon className='text-white'/>
             </IconButton>
 
             <Drawer

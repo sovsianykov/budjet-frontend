@@ -42,8 +42,12 @@ export function useProducts({ tokens, autoLoad = true }: UseProductsOptions = {}
                 const newProduct = await createProduct(data, tokens);
                 setProducts((prev) => [...prev, newProduct]);
                 return newProduct;
-            } catch (e: any) {
-                setError(e.message);
+            } catch (e: unknown) {
+
+                if ( e instanceof Error ) {
+                    setError(e.message);
+                }
+
                 throw e;
             } finally {
                 setLoading(false);
@@ -82,8 +86,11 @@ export function useProducts({ tokens, autoLoad = true }: UseProductsOptions = {}
                 setLoading(true);
                 await deleteProduct(id, tokens);
                 setProducts((prev) => prev.filter((p) => p.id !== id));
-            } catch (e: any) {
-                setError(e.message);
+            } catch (e: unknown) {
+                const err = e
+                if (err instanceof Error) {
+                    setError(err.message);
+                }
                 throw e;
             } finally {
                 setLoading(false);
@@ -96,8 +103,14 @@ export function useProducts({ tokens, autoLoad = true }: UseProductsOptions = {}
         if (autoLoad) loadProducts();
     }, [autoLoad, loadProducts]);
 
+    const getProductName = (id: string) => {
+        const product = products.find(p => p.id === id);
+        return product?.productName
+    }
+
     return {
         products,
+        getProductName,
         loading,
         error,
         reload: loadProducts,

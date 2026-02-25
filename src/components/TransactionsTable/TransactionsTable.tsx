@@ -12,13 +12,19 @@ import {
     TableHead,
     TableRow,
     Typography,
+    Stack,
+    Button,
 } from "@mui/material";
+
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import { useState } from "react";
+import DeleteIcon from "@mui/icons-material/Delete";
+
+import { useState, useEffect } from "react";
 import { Transaction } from "@/types/types";
-import {calculateTransactionTotal} from "@/utils/calculateTransactionTotal";
-import {useUsers} from "@/hooks/useUsers";
+import { calculateTransactionTotal } from "@/utils/calculateTransactionTotal";
+import { useUsers } from "@/hooks/useUsers";
+import { useTransactions } from "@/hooks/useTransactions";
 
 type TransactionTableProps = {
     transactions: Transaction[];
@@ -26,15 +32,27 @@ type TransactionTableProps = {
 
 type TransactionRowProps = {
     transaction: Transaction;
+    onDelete: (id: string) => void;
 };
 
-const TransactionRow = ({ transaction }: TransactionRowProps) => {
+const TransactionRow = ({ transaction, onDelete }: TransactionRowProps) => {
     const [open, setOpen] = useState(false);
-
     const total = calculateTransactionTotal(transaction.items);
+    const { getUserName } = useUsers();
+    const { deleteTransaction } = useTransactions();
 
-    const { getUserName }= useUsers()
+    const handleDelete = async () => {
+        const confirmed = confirm("Delete this transaction?");
+        if (!confirmed) return;
 
+        try {
+            await deleteTransaction(transaction.id);
+            onDelete(transaction.id); // уведомляем родителя
+        } catch (e) {
+            console.error(e);
+            alert("Failed to delete transaction");
+        }
+    };
 
     return (
         <>
@@ -58,7 +76,7 @@ const TransactionRow = ({ transaction }: TransactionRowProps) => {
                 </TableCell>
 
                 <TableCell align="right">
-                    <strong>{total.toFixed(2)} hrv</strong>
+                    <strong>{total.toFixed(2)}</strong>
                 </TableCell>
             </TableRow>
 
@@ -66,14 +84,28 @@ const TransactionRow = ({ transaction }: TransactionRowProps) => {
                 <TableCell colSpan={4} sx={{ p: 0 }}>
                     <Collapse in={open} timeout="auto" unmountOnExit>
                         <Box sx={{ p: 2 }}>
-                            <Typography variant="subtitle1" gutterBottom>
-                                Products
-                            </Typography>
+                            <Stack
+                                direction="row"
+                                justifyContent="space-between"
+                                alignItems="center"
+                                mb={1}
+                            >
+                                <Typography variant="subtitle1">Products</Typography>
+                                <Button
+                                    color="error"
+                                    startIcon={<DeleteIcon />}
+                                    variant="outlined"
+                                    size="small"
+                                    onClick={handleDelete}
+                                >
+                                    Delete
+                                </Button>
+                            </Stack>
 
                             <Table size="small">
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell>Product</TableCell>
+                                        <TableCell className="text-blue-800! font-semibold">Product</TableCell>
                                         <TableCell align="right">Price</TableCell>
                                         <TableCell align="right">Quantity</TableCell>
                                         <TableCell align="right">Subtotal</TableCell>
@@ -82,21 +114,13 @@ const TransactionRow = ({ transaction }: TransactionRowProps) => {
 
                                 <TableBody>
                                     {transaction.items.map((item) => {
-                                        const subtotal =
-                                            item.product.price * item.quantity;
-
+                                        const subtotal = item.product.price * item.quantity;
                                         return (
                                             <TableRow key={item.id}>
-                                                <TableCell>{item.product.name}</TableCell>
-                                                <TableCell align="right">
-                                                    {item.product.price.toFixed(2)} hrv
-                                                </TableCell>
-                                                <TableCell align="right">
-                                                    {item.quantity}
-                                                </TableCell>
-                                                <TableCell align="right">
-                                                    {subtotal.toFixed(2)} hrv
-                                                </TableCell>
+                                                <TableCell>{item.product.productName}</TableCell>
+                                                <TableCell align="right">{item.product.price.toFixed(2)}</TableCell>
+                                                <TableCell align="right">{item.quantity}</TableCell>
+                                                <TableCell align="right">{subtotal.toFixed(2)}</TableCell>
                                             </TableRow>
                                         );
                                     })}
@@ -110,8 +134,17 @@ const TransactionRow = ({ transaction }: TransactionRowProps) => {
     );
 };
 
-
 export const TransactionsTable = ({ transactions }: TransactionTableProps) => {
+    const [localTransactions, setLocalTransactions] = useState<Transaction[]>(transactions);
+
+    useEffect(() => {
+        setLocalTransactions(transactions);
+    }, [transactions]);
+
+    const handleDelete = (id: string) => {
+        setLocalTransactions((prev) => prev.filter((t) => t.id !== id));
+    };
+
     return (
         <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 3 }}>
             <Table>
@@ -125,10 +158,11 @@ export const TransactionsTable = ({ transactions }: TransactionTableProps) => {
                 </TableHead>
 
                 <TableBody>
-                    {transactions.map((transaction) => (
+                    {localTransactions.map((transaction) => (
                         <TransactionRow
                             key={transaction.id}
                             transaction={transaction}
+                            onDelete={handleDelete}
                         />
                     ))}
                 </TableBody>

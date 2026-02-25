@@ -14,7 +14,7 @@ export default function CreateProductPage() {
             <Sidebar />
             <Box className="w-full">
                 <CreateProductForm onAddProduct={addProduct} />
-                <ProductsList products={products} loading={loading} error={error} onDelete={removeProduct} />
+                <ProductsList products={products} loading={loading} error={error} onDeleteAction={removeProduct} />
             </Box>
         </Box>
     );

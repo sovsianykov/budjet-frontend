@@ -62,8 +62,6 @@ export function useTransactions(options?: UseTransactionsOptions) {
     // Create a transaction
     const createTransactionHandler = useCallback(
         async (data: CreateTransactionInput) => {
-            console.log(data)
-
             setLoading(true);
             setError(null);
             try {
@@ -71,9 +69,11 @@ export function useTransactions(options?: UseTransactionsOptions) {
                 setTransactions(prev => (prev ? [newTransaction, ...prev] : [newTransaction]));
                 return newTransaction;
             } catch (err: unknown) {
-                const e = parseError(err);
-                setError(e);
-                throw e;
+                if ( err instanceof Error ) {
+                    console.log(err.message)
+                }
+                throw err;
+
             } finally {
                 setLoading(false);
             }
@@ -138,3 +138,4 @@ export function useTransactions(options?: UseTransactionsOptions) {
         deleteTransaction: deleteTransactionHandler,
     };
 }
+

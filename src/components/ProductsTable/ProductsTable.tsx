@@ -49,7 +49,7 @@ export const ProductTable = ({ products }: ProductTableProps) => {
 
     if (!products.length) {
         return (
-            <Paper sx={{ p: 3, borderRadius: 2 }}>
+            <Paper sx={{ p: 3, borderRadius: 2 , maxWidth: 800, marginX: "auto"}}>
                 <Typography align="center" color="text.secondary">
                     No products available
                 </Typography>
@@ -58,7 +58,15 @@ export const ProductTable = ({ products }: ProductTableProps) => {
     }
 
     return (
-        <Paper sx={{ borderRadius: 2, boxShadow: 3 }}>
+        <Paper
+            sx={{
+                borderRadius: 2,
+                boxShadow: 3,
+                width: { md: 800, xs: "100%" },
+                mx: "auto",
+            }}
+
+        >
         <StyledTableContainer >
             <Table>
                 <TableHead>
@@ -75,7 +83,7 @@ export const ProductTable = ({ products }: ProductTableProps) => {
                             <TableCell>{product.productName}</TableCell>
 
                             <TableCell>
-                                ${product.price.toFixed(2)}
+                                ₴{product.price.toFixed(2)}
                             </TableCell>
 
                             <TableCell>

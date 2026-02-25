@@ -1,39 +1,28 @@
 "use client"
-import {Box, Button, CircularProgress} from "@mui/material";
+import {Box, CircularProgress} from "@mui/material";
 import Sidebar from "@/components/Sidebar/Sidebar";
+import { CreateTransactionForm } from "@/components/Forms/CreateTransactionForm";
 import {useTransactions} from "@/hooks/useTransactions";
-import {TransactionsTable} from "@/components/TransactionsTable/TransactionsTable";
-import ErrorPage from "@/app/error";
-import {useRouter} from "next/navigation";
 import {useEffect} from "react";
+import {TransactionsTable} from "@/components/TransactionsTable/TransactionsTable";
 
+export default function CreateTransactionPage() {
 
-export default function TransactionsPage() {
+   const { transactions, fetchTransactions } = useTransactions()
 
-    const {transactions, loading, error, fetchTransactions} = useTransactions();
+    useEffect(() => {
+        fetchTransactions()
+    },[fetchTransactions])
 
-
-
-
-    const router = useRouter();
-
-    if (loading) return <CircularProgress />
-
-    if (error) return <ErrorPage error={error} reset={function (): void {
-        throw new Error("Function not implemented.");
-    }} />
-
-    if (!transactions) return <div className='w-full h-screen flex flex-col items-center justify-center bg-blue-900 text-yellow-400'>
-        <h1 className='text-2xl mb-3'>We have no transactions yet...</h1>
-        <Button onClick={() => router.push("/en/transactions/new")} variant="contained" color="primary">Create a transaction
-
-        </Button>
-    </div>
+    if (!transactions) return <Box display="flex" justifyContent="center" sx={{ marginTop: 10 }}><CircularProgress/></Box>
 
     return (
-        <Box display="flex" color='gray'  width='100%' >
+        <Box display="flex" flexDirection="column" color='gray' bgcolor='white' sx={{ maxWidth: 400, marginX: "auto" }}>
             <Sidebar/>
-            <div  className='bg-blue-900 w-full min-h-screen md:ml-[240px] color-white'>
+            <div>
+                <CreateTransactionForm />
+            </div>
+            <div>
                 <TransactionsTable transactions={transactions}/>
             </div>
         </Box>
