@@ -12,10 +12,11 @@ import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
 import {useAuth} from "@/hooks/useAuth";
 import {useRouter} from "next/navigation";
 import Link from "next/link";
+import classNames from "classnames";
 
 const drawerWidth = 240;
 
-export default function Sidebar() {
+export default function Sidebar({darkMenuIcon = false}:{darkMenuIcon?:boolean}) {
     const [mobileOpen, setMobileOpen] = useState(false);
 
     const handleDrawerToggle = () => {
@@ -91,7 +92,7 @@ export default function Sidebar() {
                 onClick={handleDrawerToggle}
                 sx={{m: 1, display: {sm: "none"}}}
             >
-                <MenuIcon className='text-white'/>
+                <MenuIcon className={classNames("ml-2", {"text-blue-900": !darkMenuIcon, "text-white": darkMenuIcon})}/>
             </IconButton>
 
             <Drawer

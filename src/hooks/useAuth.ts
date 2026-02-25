@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import {useState, useEffect, useCallback} from "react";
 import { apiRequest } from "@/lib/api";
 import { Tokens, User, RegisterPayload } from "@/types/auth";
 import { config } from "@/config/config";
@@ -82,28 +82,26 @@ export function useAuth() {
     };
 
     // 👤 CURRENT USER (SESSION RESTORE)
-    const me = async (): Promise<User | null> => {
+    const me = useCallback(async (): Promise<User | null> => {
         if (!tokens?.accessToken) return null;
 
         setIsLoading(true);
         try {
-            const userData = await apiRequest<User>("/auth/me", {}, tokens);
+            // GET-запрос без body
+            const userData = await apiRequest<User>("/auth/me", undefined, tokens, "GET");
+
             setUser(userData);
             setUserId(userData.id);
             localStorage.setItem(`${STORAGE_KEY}-userId`, userData.id);
+
             return userData;
-        } catch {
-            // токен недействителен / истёк
-            setUser(null);
-            setTokens(null);
-            setUserId(null);
-            localStorage.removeItem(STORAGE_KEY);
-            localStorage.removeItem(`${STORAGE_KEY}-userId`);
+        } catch (err) {
+            console.error("ME ERROR", err);
             return null;
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [tokens]);
 
     // 🚪 LOGOUT
     const logout = () => {

@@ -47,7 +47,7 @@ const TransactionRow = ({ transaction, onDelete }: TransactionRowProps) => {
 
         try {
             await deleteTransaction(transaction.id);
-            onDelete(transaction.id); // уведомляем родителя
+            onDelete(transaction.id);
         } catch (e) {
             console.error(e);
             alert("Failed to delete transaction");
@@ -137,6 +137,22 @@ const TransactionRow = ({ transaction, onDelete }: TransactionRowProps) => {
 export const TransactionsTable = ({ transactions }: TransactionTableProps) => {
     const [localTransactions, setLocalTransactions] = useState<Transaction[]>(transactions);
 
+    const { deleteAll } = useTransactions();
+
+    const onDeleteAllTransactions = async () => {
+
+        const confirmed = confirm("Delete this transaction?");
+        if (!confirmed) return;
+        try {
+           await  deleteAll();
+        } catch (e) {
+            console.error(e);
+            alert("Failed to delete transaction");
+        }
+
+
+    }
+
     useEffect(() => {
         setLocalTransactions(transactions);
     }, [transactions]);
@@ -167,6 +183,7 @@ export const TransactionsTable = ({ transactions }: TransactionTableProps) => {
                     ))}
                 </TableBody>
             </Table>
+            <Button variant="contained" color="error" size="small" sx={{ marginTop: 2}} onClick={onDeleteAllTransactions}>delete all</Button>
         </TableContainer>
     );
 };

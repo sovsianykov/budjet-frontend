@@ -16,7 +16,7 @@ export default function ProductsPage() {
 
     return (
         <main className={styles.fullscreenBg}>
-           <Sidebar/>
+           <Sidebar darkMenuIcon/>
             {/*<Typography component="h1" color="primary" variant="h5" className='px-3 pb-6'>Products</Typography>*/}
             <ProductTable products={products}/>
         </main>

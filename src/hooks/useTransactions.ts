@@ -5,7 +5,7 @@ import {
     getTransactionById,
     createTransaction,
     updateTransaction,
-    deleteTransaction,
+    deleteTransaction, deleteAllTransactions,
 } from '@/lib/transactions';
 import { Tokens } from '@/types/auth';
 import { Transaction, CreateTransactionInput } from '@/types/types';
@@ -124,6 +124,21 @@ export function useTransactions(options?: UseTransactionsOptions) {
         [tokens, transaction]
     );
 
+    const deleteAllTransactionsHandler = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            await deleteAllTransactions(tokens);
+            setTransactions([]);
+            setTransaction(null);
+        } catch (err: unknown) {
+            const e = parseError(err);
+            setError(e);
+            throw e;
+        } finally {
+            setLoading(false);
+        }
+    }, [tokens]);
 
 
     return {
@@ -133,6 +148,7 @@ export function useTransactions(options?: UseTransactionsOptions) {
         error,
         fetchTransactions,
         fetchTransaction,
+        deleteAll: deleteAllTransactionsHandler,
         createTransaction: createTransactionHandler,
         updateTransaction: updateTransactionHandler,
         deleteTransaction: deleteTransactionHandler,

@@ -40,7 +40,7 @@ export default function CreateProductForm({ onAddProduct }: CreateProductFormPro
         <Box
             component="form"
             onSubmit={handleSubmit(onSubmit)}
-            sx={{ maxWidth: 500, display: "flex", flexDirection: "column", gap: 3, mt: 20, px: 2 }}
+            sx={{ maxWidth: 500, display: "flex", flexDirection: "column", gap: 3, px: 2 }}
         >
             <Typography variant="h5" className="text-[#1976D2]">Create Product</Typography>
 

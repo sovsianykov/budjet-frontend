@@ -9,15 +9,22 @@ export async function apiRequest<T>(
 ): Promise<T> {
     const headers: Record<string, string> = { "Content-Type": "application/json" };
 
-    const payload = tokens
-        ? { ...body, accessToken: tokens.accessToken, refreshToken: tokens.refreshToken }
-        : body;
-
-    const res = await fetch(`${config.baseApiUrl}${endpoint}`, {
+    const fetchOptions: RequestInit = {
         method,
         headers,
-        body: JSON.stringify(payload),
-    });
+    };
+
+    if (method !== "GET") {
+        fetchOptions.body = JSON.stringify(
+            tokens
+                ? { ...body, accessToken: tokens.accessToken, refreshToken: tokens.refreshToken }
+                : body
+        );
+    } else if (tokens) {
+        headers["Authorization"] = `Bearer ${tokens.accessToken}`;
+    }
+
+    const res = await fetch(`${config.baseApiUrl}${endpoint}`, fetchOptions);
 
     if (!res.ok) {
         const err = await res.json();

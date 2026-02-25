@@ -35,3 +35,9 @@ export async function deleteTransaction(id: string, tokens?: Tokens): Promise<vo
     await apiRequest<void>(`/transactions/${id}`, undefined, tokens, 'DELETE');
     // No return value
 }
+
+// Delete all transactions
+export async function deleteAllTransactions(tokens?: Tokens): Promise<void> {
+    // Calls the backend endpoint that deletes all transactions
+    await apiRequest<void>('/transactions', undefined, tokens, 'DELETE');
+}
