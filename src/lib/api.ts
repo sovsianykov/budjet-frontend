@@ -24,7 +24,8 @@ export async function apiRequest<T>(
         headers["Authorization"] = `Bearer ${tokens.accessToken}`;
     }
 
-    const res = await fetch(`${config.baseApiUrl}${endpoint}`, fetchOptions);
+    // const res = await fetch(`${config.baseApiUrl}${endpoint}`, fetchOptions);
+    const res = await fetch(`https://budjet-backend.onrender.com/api/v1${endpoint}`, fetchOptions);
 
     if (!res.ok) {
         const err = await res.json();
