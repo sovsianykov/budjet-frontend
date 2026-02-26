@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useForm, Controller } from "react-hook-form";
+import { useState } from "react";
 
 import {
   Box,
@@ -11,6 +12,7 @@ import {
   Typography,
   Container,
   Paper,
+  Alert
 } from "@mui/material";
 
 type LoginFormInputs = {
@@ -19,8 +21,9 @@ type LoginFormInputs = {
 };
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, isLoading } = useAuth();
   const router = useRouter();
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const {
     handleSubmit,
@@ -31,119 +34,117 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (data: LoginFormInputs) => {
+    setErrorMsg(null); // сброс ошибки
     try {
+      // Если login завершился без ошибки — значит вход успешный
       await login(data.email, data.password);
+
+      // Редирект сразу после успешного login
       router.push("/dashboard");
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        alert(JSON.stringify({
-          name: err.name,
-          message: err.message,
-          stack: err.stack,
-        }, null, 2));
-      }
+      if (err instanceof Error) setErrorMsg(err.message);
     }
   };
 
   return (
-    <Container
-      maxWidth="xs"
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-        backgroundColor: "background.default",
-      }}
-    >
-      <Paper sx={{ p: 4, width: "100%", backgroundColor: "background.paper" }} >
-        <Typography
-            variant="h4"
-            fontWeight={700}
-            align="center"
-            mb={1}
-        >
-          Sign In
-        </Typography>
-
-        <Typography
-            variant="body1"
-            color="text.primary"
-            align="center"
-            mb={4}
-        >
-          Welcome back to Family Budget site
-        </Typography>
-
-        <Typography variant="h5" mb={3} align="center">
-          Login
-        </Typography>
-
-        <Box component="form" noValidate onSubmit={handleSubmit(onSubmit)} display="flex" flexDirection="column" gap={2}>
-          {/* Email */}
-          <Controller
-            name="email"
-            control={control}
-            rules={{
-              required: "Email обязателен",
-              pattern: { value: /^\S+@\S+$/i, message: "Неверный email" },
-            }}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                autoComplete="email"
-                label="Email"
-                type="email"
-                fullWidth
-                error={!!errors.email}
-                helperText={errors.email?.message}
-              />
-            )}
-          />
-
-          {/* Password */}
-          <Controller
-            name="password"
-            control={control}
-            rules={{ required: "Password is required" }}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                autoComplete="current-password"
-                label="Password"
-                type="password"
-                fullWidth
-                error={!!errors.password}
-                helperText={errors.password?.message}
-              />
-            )}
-          />
-
-          <Button type="submit" variant="contained" color="success" fullWidth disabled={isSubmitting}>
-            {isSubmitting ? "Logging in..." : "Login"}
-          </Button>
-        </Box>
-        <Typography
-            variant="body2"
-            align="center"
-            color="text.secondary"
-            mt={3}
-        >
-          Don&#39;t have an account? {" "}
-          <Typography
-              component="span"
-              sx={{
-                cursor: "pointer",
-                fontWeight: 500,
-                textDecoration: "underline",
-              }}
-              onClick={() => router.push("/register")}
-          >
-            sign up
+      <Container
+          maxWidth="xs"
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100vh",
+            backgroundColor: "background.default",
+          }}
+      >
+        <Paper sx={{ p: 4, width: "100%", backgroundColor: "background.paper" }}>
+          <Typography variant="h4" fontWeight={700} align="center" mb={1}>
+            Sign In
           </Typography>
-        </Typography>
 
-      </Paper>
-    </Container>
+          <Typography variant="body1" color="text.primary" align="center" mb={4}>
+            Welcome back to Family Budget site
+          </Typography>
+
+          {errorMsg && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {errorMsg}
+              </Alert>
+          )}
+
+          <Box
+              component="form"
+              noValidate
+              onSubmit={handleSubmit(onSubmit)}
+              display="flex"
+              flexDirection="column"
+              gap={2}
+          >
+            {/* Email */}
+            <Controller
+                name="email"
+                control={control}
+                rules={{
+                  required: "Email обязателен",
+                  pattern: { value: /^\S+@\S+$/i, message: "Неверный email" },
+                }}
+                render={({ field }) => (
+                    <TextField
+                        {...field}
+                        autoComplete="email"
+                        label="Email"
+                        type="email"
+                        fullWidth
+                        error={!!errors.email}
+                        helperText={errors.email?.message}
+                    />
+                )}
+            />
+
+            {/* Password */}
+            <Controller
+                name="password"
+                control={control}
+                rules={{ required: "Password is required" }}
+                render={({ field }) => (
+                    <TextField
+                        {...field}
+                        autoComplete="current-password"
+                        label="Password"
+                        type="password"
+                        fullWidth
+                        error={!!errors.password}
+                        helperText={errors.password?.message}
+                    />
+                )}
+            />
+
+            <Button
+                type="submit"
+                variant="contained"
+                color="success"
+                fullWidth
+                disabled={isSubmitting || isLoading}
+            >
+              {isSubmitting || isLoading ? "Logging in..." : "Login"}
+            </Button>
+          </Box>
+
+          <Typography variant="body2" align="center" color="text.secondary" mt={3}>
+            Don&#39;t have an account?{" "}
+            <Typography
+                component="span"
+                sx={{
+                  cursor: "pointer",
+                  fontWeight: 500,
+                  textDecoration: "underline",
+                }}
+                onClick={() => router.push("/register")}
+            >
+              sign up
+            </Typography>
+          </Typography>
+        </Paper>
+      </Container>
   );
 }
