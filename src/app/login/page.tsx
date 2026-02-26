@@ -36,7 +36,11 @@ export default function LoginPage() {
       router.push("/dashboard");
     } catch (err: unknown) {
       if (err instanceof Error) {
-        alert(JSON.stringify(err.name, err.stack , err.message));
+        alert(JSON.stringify({
+          name: err.name,
+          message: err.message,
+          stack: err.stack,
+        }, null, 2));
       }
     }
   };
