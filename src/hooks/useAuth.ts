@@ -1,6 +1,6 @@
 "use client";
 
-import {useState, useEffect, useCallback} from "react";
+import {useState, useCallback} from "react";
 import { apiRequest } from "@/lib/api";
 import { Tokens, User, RegisterPayload } from "@/types/auth";
 import { config } from "@/config/config";

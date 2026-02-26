@@ -1,3 +1,4 @@
+"use client";
 import {Transaction, TransactionItem} from "@/types/types";
 import {Box, Collapse, IconButton, Table, TableBody, TableCell, TableHead, TableRow, Typography} from "@mui/material";
 import { useState } from "react";

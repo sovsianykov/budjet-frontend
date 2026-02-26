@@ -1,3 +1,4 @@
+"use client";
 import type { Tokens } from '@/types/auth';
 import { Product } from '@/types/types';
 import { apiRequest } from '@/lib/api';
