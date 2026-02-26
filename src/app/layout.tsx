@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
-import {loadSettings} from "@/contentful/loadSettings";
-import {SettingsProvider} from "@/contexts/SettingsProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,17 +24,14 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
 
-    const settings = await loadSettings();
 
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased `}
       >
-       <SettingsProvider lang={"en"} settings={settings}>
 
        <Providers>{children}</Providers>
-       </SettingsProvider>
 
       </body>
     </html>

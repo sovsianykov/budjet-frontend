@@ -1,6 +1,5 @@
 "use client";
 
-import { useSettingsContext } from "@/contexts/SettingsProvider";
 import {ArrowBack} from "@mui/icons-material"
 import {ArrowForward} from "@mui/icons-material"
 import {
@@ -20,12 +19,6 @@ type ProductsListProps = {
 };
 
 export default function ProductsList({ products, loading, error, onDeleteAction }: ProductsListProps) {
-    const { getLabelsForCommonKey } = useSettingsContext();
-    const { product, price } = getLabelsForCommonKey("productList", [
-        "product",
-        "price",
-    ]);
-
 
     if (loading)
         return (
