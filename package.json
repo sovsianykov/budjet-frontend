@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "types:contentful": "export $(cat .env | awk '!/^\\s*#/' | awk '!/^\\s*$/'); cf-content-types-generator --spaceId $NEXT_PUBLIC_CONTENTFUL_SPACE_ID --token $NEXT_PUBLIC_CONTENTFUL_API_TOKEN -o ./src/contentful/_generated -X --v10 -r"
+    "lint": "eslint"
   },
   "dependencies": {
     "@contentful/live-preview": "^4.5.14",
