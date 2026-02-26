@@ -18,8 +18,11 @@ export default function DashboardPage() {
     return (
         <Box display="flex" color='gray' bgcolor='white' className={styles.fullscreenDashboardBg}>
             <Sidebar darkMenuIcon/>
-            <Box component="main" sx={{ flexGrow: 1, p: 3 }} className='text-white!'>
-                <Typography variant="h4" >Welcome, {user?.firstName || user?.email}</Typography>
+            <Box component="main" sx={{ flexGrow: 1, p: 3 }} className='text-white! flex flex-col items-center'>
+
+               <div>
+                   <Typography variant="h4" className="md:mx-auto!" >Welcome, {user?.firstName || user?.email}</Typography>
+               </div>
                 <Typography mt={2}>
                     this is your groceries app!
                 </Typography>
