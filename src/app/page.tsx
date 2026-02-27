@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Box, CircularProgress } from "@mui/material";
 import { useAuth } from "@/hooks/useAuth";
+import {router} from "next/client";
 
 export default function HomePage() {
   // const { isAuthenticated, isLoading } = useAuth();
@@ -18,6 +19,8 @@ export default function HomePage() {
   //     router.replace("/login");
   //   }
   // }, [isAuthenticated, isLoading, router]);
+
+    router.replace('/dashboard');
 
   return (
       <Box
