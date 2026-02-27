@@ -6,13 +6,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
 
 export default function ProfilePage() {
-    const { me, tokens, user } = useAuth();
+    const {  user } = useAuth();
 
-    useEffect(() => {
-        if (tokens?.accessToken) {
-            me();
-        }
-    }, [tokens?.accessToken]);
+
 
     if (!user) {
         return (

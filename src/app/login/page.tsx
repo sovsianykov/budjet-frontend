@@ -21,7 +21,7 @@ type LoginFormInputs = {
 };
 
 export default function LoginPage() {
-    const { login, user, isLoading,isAuthenticated } = useAuth();
+    const { login,isLoading,isAuthenticated } = useAuth();
     const router = useRouter();
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -33,10 +33,9 @@ export default function LoginPage() {
         defaultValues: { email: "", password: "" },
     });
 
-    // ✅ Редирект после успешного входа
     useEffect(() => {
         if (isAuthenticated) {
-            router.push("/dashboard");
+            router.replace("/dashboard");
         }
     }, [isAuthenticated, router]);
 

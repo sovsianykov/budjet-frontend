@@ -42,7 +42,7 @@ export default function RegisterPage() {
 
     const onSubmit = async (data: RegisterForm) => {
         await registerUser(data);
-        router.push("/dashboard");
+        router.replace("/dashboard");
     };
 
     return (
