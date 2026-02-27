@@ -21,7 +21,7 @@ type LoginFormInputs = {
 };
 
 export default function LoginPage() {
-    const { login, user, isLoading } = useAuth();
+    const { login, user, isLoading,isAuthenticated } = useAuth();
     const router = useRouter();
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -35,10 +35,10 @@ export default function LoginPage() {
 
     // ✅ Редирект после успешного входа
     useEffect(() => {
-        if (user) {
+        if (isAuthenticated) {
             router.push("/dashboard");
         }
-    }, [user, router]);
+    }, [isAuthenticated, router]);
 
     const onSubmit = async (data: LoginFormInputs) => {
         setErrorMsg(null); // сброс ошибки
