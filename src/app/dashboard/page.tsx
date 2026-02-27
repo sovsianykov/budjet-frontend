@@ -5,15 +5,15 @@ import { Box, Typography } from "@mui/material";
 import { useAuth } from "@/hooks/useAuth";
 import styles from './dashboard.module.scss'
 import {useEffect} from "react";
+import {redirect} from "next/navigation";
 
 export default function DashboardPage() {
-    const { user , tokens, me} = useAuth();
+    const { user ,  isLoading, isAuthenticated} = useAuth();
 
-    useEffect(() => {
-        if (tokens?.accessToken) {
-            me();
-        }
-    }, [tokens?.accessToken]);
+    if (isLoading) return
+    if (!isAuthenticated) redirect('/login')
+
+
 
     return (
         <Box display="flex" color='gray' bgcolor='white' className={styles.fullscreenDashboardBg}>
