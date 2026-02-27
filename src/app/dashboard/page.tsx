@@ -8,8 +8,8 @@ import {router} from "next/client";
 export default function DashboardPage() {
     const { user ,  isLoading, isAuthenticated} = useAuth();
 
-    if (isLoading) return
-    if (!isAuthenticated) router.replace('/login')
+    // if (isLoading) return
+    // if (!isAuthenticated) router.replace('/login')
 
 
 
