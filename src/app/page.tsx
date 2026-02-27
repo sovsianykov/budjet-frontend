@@ -4,23 +4,20 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Box, CircularProgress } from "@mui/material";
 import { useAuth } from "@/hooks/useAuth";
-import {router} from "next/client";
 
 export default function HomePage() {
-  // const { isAuthenticated, isLoading } = useAuth();
-  // const router = useRouter();
-  //
-  // useEffect(() => {
-  //   if (isLoading) return;
-  //
-  //   if (isAuthenticated) {
-  //     router.replace("/dashboard");
-  //   } else {
-  //     router.replace("/login");
-  //   }
-  // }, [isAuthenticated, isLoading, router]);
+  const { isAuthenticated, isLoading } = useAuth();
+  const router = useRouter();
 
-    router.replace('/dashboard');
+  useEffect(() => {
+    if (isLoading) return;
+
+    if (isAuthenticated) {
+      router.replace("/dashboard");
+    } else {
+      router.replace("/login");
+    }
+  }, [isAuthenticated, isLoading, router]);
 
   return (
       <Box

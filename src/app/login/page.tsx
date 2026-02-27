@@ -1,152 +1,57 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
 import { useAuth } from "@/hooks/useAuth";
-import { useForm, Controller } from "react-hook-form";
-import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Container, Paper, TextField, Button, Alert } from "@mui/material";
+import { useState } from "react";
 
-import {
-    Box,
-    Button,
-    TextField,
-    Typography,
-    Container,
-    Paper,
-    Alert
-} from "@mui/material";
+type Form = { email: string; password: string };
 
-type LoginFormInputs = {
-    email: string;
-    password: string;
-};
-
-export default function LoginPage() {
-    const { login,isLoading,isAuthenticated } = useAuth();
+export default function LoginMUI() {
+    const { login } = useAuth();
     const router = useRouter();
-    const [errorMsg, setErrorMsg] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
-    const {
-        handleSubmit,
-        control,
-        formState: { errors, isSubmitting },
-    } = useForm<LoginFormInputs>({
-        defaultValues: { email: "", password: "" },
-    });
+    const { register, handleSubmit, formState: { errors, isSubmitting } } =
+        useForm<Form>();
 
-    useEffect(() => {
-        if (isAuthenticated) {
-            router.replace("/dashboard");
-        }
-    }, [isAuthenticated, router]);
-
-    const onSubmit = async (data: LoginFormInputs) => {
-        setErrorMsg(null); // сброс ошибки
+    const onSubmit = async (data: Form) => {
         try {
             await login(data.email, data.password);
-            // больше не нужно делать router.push здесь
-        } catch (err: unknown) {
-            if (err instanceof Error) setErrorMsg(err.message);
+            router.replace("/dashboard");
+        } catch (e) {
+            if (e instanceof Error) setError(e.message);
         }
     };
 
     return (
-        <Container
-            maxWidth="xs"
-            sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                height: "100vh",
-                backgroundColor: "background.default",
-            }}
-        >
-            <Paper sx={{ p: 4, width: "100%", backgroundColor: "background.paper" }}>
-                <Typography variant="h4" fontWeight={700} align="center" mb={1}>
-                    Sign In
-                </Typography>
+        <Container maxWidth="xs">
+            <Paper sx={{ p: 4 }}>
+                {error && <Alert severity="error">{error}</Alert>}
 
-                <Typography variant="body1" color="text.primary" align="center" mb={4}>
-                    Welcome back to Family Budget site
-                </Typography>
-
-                {errorMsg && (
-                    <Alert severity="error" sx={{ mb: 2 }}>
-                        {errorMsg}
-                    </Alert>
-                )}
-
-                <Box
-                    component="form"
-                    noValidate
-                    onSubmit={handleSubmit(onSubmit)}
-                    display="flex"
-                    flexDirection="column"
-                    gap={2}
-                >
-                    {/* Email */}
-                    <Controller
-                        name="email"
-                        control={control}
-                        rules={{
-                            required: "Email обязателен",
-                            pattern: { value: /^\S+@\S+$/i, message: "Неверный email" },
-                        }}
-                        render={({ field }) => (
-                            <TextField
-                                {...field}
-                                autoComplete="email"
-                                label="Email"
-                                type="email"
-                                fullWidth
-                                error={!!errors.email}
-                                helperText={errors.email?.message}
-                            />
-                        )}
-                    />
-
-                    {/* Password */}
-                    <Controller
-                        name="password"
-                        control={control}
-                        rules={{ required: "Password is required" }}
-                        render={({ field }) => (
-                            <TextField
-                                {...field}
-                                autoComplete="current-password"
-                                label="Password"
-                                type="password"
-                                fullWidth
-                                error={!!errors.password}
-                                helperText={errors.password?.message}
-                            />
-                        )}
-                    />
-
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        color="success"
+                <form onSubmit={handleSubmit(onSubmit)}>
+                    <TextField
+                        label="Email"
                         fullWidth
-                        disabled={isSubmitting || isLoading}
-                    >
-                        {isSubmitting || isLoading ? "Logging in..." : "Login"}
-                    </Button>
-                </Box>
+                        margin="normal"
+                        {...register("email", { required: true })}
+                        error={!!errors.email}
+                    />
 
-                <Typography variant="body2" align="center" color="text.secondary" mt={3}>
-                    Don&#39;t have an account?{" "}
-                    <Typography
-                        component="span"
-                        sx={{
-                            cursor: "pointer",
-                            fontWeight: 500,
-                            textDecoration: "underline",
-                        }}
-                        onClick={() => router.push("/register")}
-                    >
-                        sign up
-                    </Typography>
-                </Typography>
+                    <TextField
+                        label="Password"
+                        type="password"
+                        fullWidth
+                        margin="normal"
+                        {...register("password", { required: true })}
+                        error={!!errors.password}
+                    />
+
+                    <Button fullWidth type="submit" variant="contained" disabled={isSubmitting}>
+                        Login
+                    </Button>
+                </form>
             </Paper>
         </Container>
     );

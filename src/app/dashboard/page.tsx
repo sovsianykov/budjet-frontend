@@ -1,15 +1,17 @@
 "use client";
+
 import Sidebar from "../../components/Sidebar/Sidebar";
 import { Box, Typography } from "@mui/material";
 import { useAuth } from "@/hooks/useAuth";
 import styles from './dashboard.module.scss'
-import {router} from "next/client";
+import {useEffect} from "react";
+import {redirect} from "next/navigation";
 
 export default function DashboardPage() {
     const { user ,  isLoading, isAuthenticated} = useAuth();
 
-    // if (isLoading) return
-    // if (!isAuthenticated) router.replace('/login')
+    if (isLoading) return
+    if (!isAuthenticated) redirect('/login')
 
 
 
