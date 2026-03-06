@@ -1,6 +1,6 @@
 export type Role = "ADMIN" | "USER";
 
-export interface User {
+export type User = {
   id: string;
   email: string;
   firstName?: string;

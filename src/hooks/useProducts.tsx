@@ -7,15 +7,13 @@ import {
     updateProduct,
     deleteProduct,
 } from '@/lib/products';
-import type { Tokens } from '@/types/auth';
 import {Product} from "@/types/types";
 
 interface UseProductsOptions {
-    tokens?: Tokens;
-    autoLoad?: boolean; // загружать ли сразу
+    autoLoad?: boolean;
 }
 
-export function useProducts({ tokens, autoLoad = true }: UseProductsOptions = {}) {
+export function useProducts({ autoLoad = true }: UseProductsOptions = {}) {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -25,21 +23,21 @@ export function useProducts({ tokens, autoLoad = true }: UseProductsOptions = {}
         try {
             setLoading(true);
             setError(null);
-            const data = await getProducts(tokens);
+            const data = await getProducts();
             setProducts(data);
         } catch (e: any) {
             setError(e.message);
         } finally {
             setLoading(false);
         }
-    }, [tokens]);
+    }, []);
 
     // ===== CREATE =====
     const addProduct = useCallback(
         async (data: Omit<Product, 'id'>) => {
             try {
                 setLoading(true);
-                const newProduct = await createProduct(data, tokens);
+                const newProduct = await createProduct(data);
                 setProducts((prev) => [...prev, newProduct]);
                 return newProduct;
             } catch (e: unknown) {
@@ -53,7 +51,7 @@ export function useProducts({ tokens, autoLoad = true }: UseProductsOptions = {}
                 setLoading(false);
             }
         },
-        [tokens]
+        []
     );
 
     // ===== UPDATE =====
@@ -61,7 +59,7 @@ export function useProducts({ tokens, autoLoad = true }: UseProductsOptions = {}
         async (id: string, updates: Partial<Product>) => {
             try {
                 setLoading(true);
-                const updated = await updateProduct(id, updates, tokens);
+                const updated = await updateProduct(id, updates);
                 setProducts((prev) =>
                     prev.map((p) => (p.id === id ? updated : p))
                 );
@@ -76,7 +74,7 @@ export function useProducts({ tokens, autoLoad = true }: UseProductsOptions = {}
                 setLoading(false);
             }
         },
-        [tokens]
+        []
     );
 
     // ===== DELETE =====
@@ -84,7 +82,7 @@ export function useProducts({ tokens, autoLoad = true }: UseProductsOptions = {}
         async (id: string) => {
             try {
                 setLoading(true);
-                await deleteProduct(id, tokens);
+                await deleteProduct(id);
                 setProducts((prev) => prev.filter((p) => p.id !== id));
             } catch (e: unknown) {
                 const err = e
@@ -96,7 +94,7 @@ export function useProducts({ tokens, autoLoad = true }: UseProductsOptions = {}
                 setLoading(false);
             }
         },
-        [tokens]
+        []
     );
 
     useEffect(() => {

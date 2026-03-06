@@ -1,43 +1,38 @@
 // lib/transactions.ts
 import {apiRequest} from './api';
-import {Tokens} from '@/types/auth';
 import {CreateTransactionInput, Transaction} from '@/types/types';
 
 // Get all transactions
-export async function getTransactions(tokens?: Tokens): Promise<Transaction[]> {
-    return await apiRequest<Transaction[]>('/transactions', undefined, tokens, 'GET');
+export async function getTransactions(): Promise<Transaction[]> {
+    return await apiRequest<Transaction[]>('/transactions', undefined, 'GET');
 }
 
 // Get single transaction by ID
-export async function getTransactionById(id: string, tokens?: Tokens): Promise<Transaction> {
-    return await apiRequest<Transaction>(`/transactions/${id}`, undefined, tokens, 'GET');
+export async function getTransactionById(id: string): Promise<Transaction> {
+    return await apiRequest<Transaction>(`/transactions/${id}`, undefined, 'GET');
 }
 
 // Create a new transaction
 export async function createTransaction(
     data: CreateTransactionInput,
-    tokens?: Tokens,
 ): Promise<Transaction> {
-    return await apiRequest<Transaction>('/transactions', data, tokens, 'POST');
+    return await apiRequest<Transaction>('/transactions', data, 'POST');
 }
 
 // Update a transaction
 export async function updateTransaction(
     id: string,
     data: Partial<CreateTransactionInput>,
-    tokens?: Tokens,
 ): Promise<Transaction> {
-    return await apiRequest<Transaction>(`/transactions/${id}`, data, tokens, 'PUT');
+    return await apiRequest<Transaction>(`/transactions/${id}`, data, 'PUT');
 }
 
 // Delete a transaction
-export async function deleteTransaction(id: string, tokens?: Tokens): Promise<void> {
-    await apiRequest<void>(`/transactions/${id}`, undefined, tokens, 'DELETE');
-    // No return value
+export async function deleteTransaction(id: string): Promise<void> {
+    await apiRequest<void>(`/transactions/${id}`, undefined, 'DELETE');
 }
 
 // Delete all transactions
-export async function deleteAllTransactions(tokens?: Tokens): Promise<void> {
-    // Calls the backend endpoint that deletes all transactions
-    await apiRequest<void>('/transactions', undefined, tokens, 'DELETE');
+export async function deleteAllTransactions(): Promise<void> {
+    await apiRequest<void>('/transactions', undefined, 'DELETE');
 }

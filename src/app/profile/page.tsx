@@ -3,18 +3,11 @@
 import { Box, Avatar, Typography, Card, CardContent, Divider } from "@mui/material";
 import Sidebar from "@/components/Sidebar/Sidebar";
 import { useAuth } from "@/hooks/useAuth";
-import { useEffect } from "react";
 
 export default function ProfilePage() {
-    const { me, tokens, user } = useAuth();
+    const { user, isLoading } = useAuth();
 
-    useEffect(() => {
-        if (tokens?.accessToken) {
-            me();
-        }
-    }, [tokens?.accessToken]);
-
-    if (!user) {
+    if (isLoading || !user) {
         return (
             <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
                 <Typography variant="h6">Loading profile...</Typography>

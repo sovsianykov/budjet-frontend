@@ -7,21 +7,14 @@ import {
     updateTransaction,
     deleteTransaction, deleteAllTransactions,
 } from '@/lib/transactions';
-import { Tokens } from '@/types/auth';
 import { Transaction, CreateTransactionInput } from '@/types/types';
-
-interface UseTransactionsOptions {
-    tokens?: Tokens;
-}
 
 function parseError(err: unknown): Error {
     if (err instanceof Error) return err;
     return new Error(String(err));
 }
 
-export function useTransactions(options?: UseTransactionsOptions) {
-    const tokens = options?.tokens;
-
+export function useTransactions() {
     const [transactions, setTransactions] = useState<Transaction[] | null>(null);
     const [transaction, setTransaction] = useState<Transaction | null>(null);
     const [loading, setLoading] = useState(false);
@@ -32,14 +25,14 @@ export function useTransactions(options?: UseTransactionsOptions) {
         setLoading(true);
         setError(null);
         try {
-            const data = await getTransactions(tokens);
+            const data = await getTransactions();
             setTransactions(data);
         } catch (err: unknown) {
             setError(parseError(err));
         } finally {
             setLoading(false);
         }
-    }, [tokens]);
+    }, []);
 
     // Fetch a single transaction by ID
     const fetchTransaction = useCallback(
@@ -48,7 +41,7 @@ export function useTransactions(options?: UseTransactionsOptions) {
             setLoading(true);
             setError(null);
             try {
-                const data = await getTransactionById(id, tokens);
+                const data = await getTransactionById(id);
                 setTransaction(data);
             } catch (err: unknown) {
                 setError(parseError(err));
@@ -56,7 +49,7 @@ export function useTransactions(options?: UseTransactionsOptions) {
                 setLoading(false);
             }
         },
-        [tokens]
+        []
     );
 
     // Create a transaction
@@ -65,7 +58,7 @@ export function useTransactions(options?: UseTransactionsOptions) {
             setLoading(true);
             setError(null);
             try {
-                const newTransaction = await createTransaction(data, tokens);
+                const newTransaction = await createTransaction(data);
                 setTransactions(prev => (prev ? [newTransaction, ...prev] : [newTransaction]));
                 return newTransaction;
             } catch (err: unknown) {
@@ -78,7 +71,7 @@ export function useTransactions(options?: UseTransactionsOptions) {
                 setLoading(false);
             }
         },
-        [tokens]
+        []
     );
 
     // Update a transaction
@@ -87,7 +80,7 @@ export function useTransactions(options?: UseTransactionsOptions) {
             setLoading(true);
             setError(null);
             try {
-                const updated = await updateTransaction(id, data, tokens);
+                const updated = await updateTransaction(id, data);
                 setTransactions(prev =>
                     prev ? prev.map(t => (t.id === id ? updated : t)) : [updated]
                 );
@@ -101,7 +94,7 @@ export function useTransactions(options?: UseTransactionsOptions) {
                 setLoading(false);
             }
         },
-        [tokens, transaction]
+        [transaction]
     );
 
     // Delete a transaction
@@ -110,7 +103,7 @@ export function useTransactions(options?: UseTransactionsOptions) {
             setLoading(true);
             setError(null);
             try {
-                await deleteTransaction(id, tokens);
+                await deleteTransaction(id);
                 setTransactions(prev => (prev ? prev.filter(t => t.id !== id) : null));
                 if (transaction?.id === id) setTransaction(null);
             } catch (err: unknown) {
@@ -121,14 +114,14 @@ export function useTransactions(options?: UseTransactionsOptions) {
                 setLoading(false);
             }
         },
-        [tokens, transaction]
+        [transaction]
     );
 
     const deleteAllTransactionsHandler = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
-            await deleteAllTransactions(tokens);
+            await deleteAllTransactions();
             setTransactions([]);
             setTransaction(null);
         } catch (err: unknown) {
@@ -138,7 +131,7 @@ export function useTransactions(options?: UseTransactionsOptions) {
         } finally {
             setLoading(false);
         }
-    }, [tokens]);
+    }, []);
 
 
     return {
@@ -154,4 +147,3 @@ export function useTransactions(options?: UseTransactionsOptions) {
         deleteTransaction: deleteTransactionHandler,
     };
 }
-

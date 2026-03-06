@@ -1,219 +1,142 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { apiRequest } from "@/lib/api";
-import { Tokens, User, RegisterPayload } from "@/types/auth";
+import { apiRequest, ApiError } from "@/lib/api";
+import { User, RegisterPayload } from "@/types/auth";
 import { config } from "@/config/config";
 
 const STORAGE_KEY = config.storageKey;
 
 /* ---------------------------------- */
-/* helpers */
+/* localStorage helpers (userId only) */
 /* ---------------------------------- */
-
-const readTokens = (): Tokens | null => {
-    if (typeof window === "undefined") return null;
-
-    try {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        return stored ? JSON.parse(stored) : null;
-    } catch {
-        localStorage.removeItem(STORAGE_KEY);
-        return null;
-    }
-};
-
 const readUserId = (): string | null => {
     if (typeof window === "undefined") return null;
     return localStorage.getItem(`${STORAGE_KEY}-userId`);
 };
 
-const saveSession = (tokens: Tokens, userId: string) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(tokens));
+const saveUserId = (userId: string) => {
     localStorage.setItem(`${STORAGE_KEY}-userId`, userId);
 };
 
-const clearSession = () => {
-    localStorage.removeItem(STORAGE_KEY);
+const clearUserId = () => {
     localStorage.removeItem(`${STORAGE_KEY}-userId`);
 };
 
 /* ---------------------------------- */
 /* hook */
 /* ---------------------------------- */
-
 export function useAuth() {
-    const [tokens, setTokens] = useState<Tokens | null>(null);
     const [user, setUser] = useState<User | null>(null);
-    const [userId, setUserId] = useState<string | null>(null);
-
-    // важно: при старте всегда loading
+    const [userId, setUserId] = useState<string | null>(readUserId());
     const [isLoading, setIsLoading] = useState(true);
 
     /* ---------------------------------- */
-    /* logout */
+    /* fetch current user (me) */
     /* ---------------------------------- */
+    const fetchMe = useCallback(async (): Promise<User | null> => {
+        try {
+            const data = await apiRequest<{ user: User }>(
+                "/auth/me",
+                undefined,
+                "GET",
+            );
 
-    const logout = useCallback(() => {
-        clearSession();
-        setTokens(null);
-        setUser(null);
-        setUserId(null);
-    }, []);
+            setUser(data.user);
+            setUserId(data.user.id);
+            saveUserId(data.user.id);
 
-    /* ---------------------------------- */
-    /* fetch current user */
-    /* ---------------------------------- */
-
-    const fetchMe = useCallback(
-        async (activeTokens: Tokens): Promise<User | null> => {
-            try {
-                const userData = await apiRequest<User>(
-                    "/auth/me",
-                    undefined,
-                    activeTokens,
-                    "GET"
-                );
-
-                setUser(userData);
-                setUserId(userData.id);
-                localStorage.setItem(`${STORAGE_KEY}-userId`, userData.id);
-
-                return userData;
-            } catch (err) {
-                console.error("ME ERROR", err);
+            return data.user;
+        } catch (err) {
+            if (err instanceof ApiError && err.status === 401) {
+                // пользователь не залогинен — это нормально
+                setUser(null);
+                setUserId(null);
+                clearUserId();
                 return null;
             }
-        },
-        []
-    );
+
+            console.error("ME ERROR", err);
+            setUser(null);
+            setUserId(null);
+            clearUserId();
+            return null;
+        }
+    }, []);
 
     /* ---------------------------------- */
     /* session restore on app start */
     /* ---------------------------------- */
-
     useEffect(() => {
-        const init = async () => {
-            const storedTokens = readTokens();
-            const storedUserId = readUserId();
-
-            if (!storedTokens) {
-                setIsLoading(false);
-                return;
-            }
-
-            setTokens(storedTokens);
-            if (storedUserId) setUserId(storedUserId);
-
-            const user = await fetchMe(storedTokens);
-
-            // если токен битый — очищаем сессию
-            if (!user) {
-                logout();
-            }
-
-            setIsLoading(false);
-        };
-
-        init();
-    }, [fetchMe, logout]);
+        fetchMe().finally(() => setIsLoading(false));
+    }, [fetchMe]);
 
     /* ---------------------------------- */
     /* login */
     /* ---------------------------------- */
-
-    const login = async (email: string, password: string) => {
+    const login = useCallback(async (email: string, password: string) => {
         setIsLoading(true);
-
         try {
-            const data = await apiRequest<{
-                user: User;
-                accessToken: string;
-                refreshToken: string;
-            }>("/auth/sign_in", { email, password });
+            const data = await apiRequest<{ user: User }>(
+                "/auth/sign_in",
+                { email, password },
+            );
 
-            const newTokens: Tokens = {
-                accessToken: data.accessToken,
-                refreshToken: data.refreshToken,
-            };
-
-            saveSession(newTokens, data.user.id);
-
-            setTokens(newTokens);
             setUser(data.user);
             setUserId(data.user.id);
+            saveUserId(data.user.id);
         } finally {
             setIsLoading(false);
         }
-    };
+    }, []);
 
     /* ---------------------------------- */
     /* register */
     /* ---------------------------------- */
-
-    const register = async (payload: RegisterPayload) => {
+    const register = useCallback(async (payload: RegisterPayload) => {
         setIsLoading(true);
-
         try {
-            const data = await apiRequest<{
-                user: User;
-                accessToken: string;
-                refreshToken: string;
-            }>("/auth/sign_up", payload);
+            const data = await apiRequest<{ user: User }>(
+                "/auth/sign_up",
+                payload,
+            );
 
-            const newTokens: Tokens = {
-                accessToken: data.accessToken,
-                refreshToken: data.refreshToken,
-            };
-
-            saveSession(newTokens, data.user.id);
-
-            setTokens(newTokens);
             setUser(data.user);
             setUserId(data.user.id);
+            saveUserId(data.user.id);
         } finally {
             setIsLoading(false);
         }
-    };
+    }, []);
 
     /* ---------------------------------- */
-    /* refresh token */
+    /* logout */
     /* ---------------------------------- */
-
-    const refresh = async () => {
-        if (!tokens?.refreshToken) throw new Error("No refresh token");
-
-        const newTokens = await apiRequest<Tokens>(
-            "/auth/refresh",
-            { token: tokens.refreshToken },
-            tokens
-        );
-
-        saveSession(newTokens, userId!);
-        setTokens(newTokens);
-
-        return newTokens;
-    };
+    const logout = useCallback(async () => {
+        try {
+            await apiRequest(
+                "/auth/logout",
+            );
+        } finally {
+            setUser(null);
+            setUserId(null);
+            clearUserId();
+        }
+    }, []);
 
     /* ---------------------------------- */
     /* derived state */
     /* ---------------------------------- */
-
-    const isAuthenticated = !!tokens?.accessToken;
-
-    /* ---------------------------------- */
+    const isAuthenticated = !!user;
 
     return {
         user,
         userId,
-        tokens,
         isAuthenticated,
         isLoading,
-
         login,
         register,
         logout,
-        refresh,
-        me: () => (tokens ? fetchMe(tokens) : Promise.resolve(null)),
+        fetchMe,
     };
 }

@@ -3,7 +3,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { getUsers } from "@/lib/users";
 import { User } from "@/types/auth";
-import { Tokens } from "@/types/auth";
 
 interface UseUsersResult {
     users: User[] | null;
@@ -13,7 +12,7 @@ interface UseUsersResult {
     refetch: () => Promise<void>;
 }
 
-export function useUsers(tokens?: Tokens): UseUsersResult {
+export function useUsers(): UseUsersResult {
     const [users, setUsers] = useState<User[] | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
@@ -23,14 +22,14 @@ export function useUsers(tokens?: Tokens): UseUsersResult {
             setLoading(true);
             setError(null);
 
-            const data = await getUsers(tokens);
+            const data = await getUsers();
             setUsers(data);
         } catch (err) {
             setError(err instanceof Error ? err : new Error("Failed to fetch users"));
         } finally {
             setLoading(false);
         }
-    }, [tokens]);
+    }, []);
 
     useEffect(() => {
         fetchUsers();
