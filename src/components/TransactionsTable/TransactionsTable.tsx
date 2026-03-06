@@ -20,11 +20,12 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-import { useState, useEffect } from "react";
-import { Transaction } from "@/types/types";
-import { calculateTransactionTotal } from "@/utils/calculateTransactionTotal";
-import { useUsers } from "@/hooks/useUsers";
-import { useTransactions } from "@/hooks/useTransactions";
+import {useState, useEffect} from "react";
+import {Transaction} from "@/types/types";
+import {calculateTransactionTotal} from "@/utils/calculateTransactionTotal";
+import {useUsers} from "@/hooks/useUsers";
+import {useTransactions} from "@/hooks/useTransactions";
+import {useAuth} from "@/contexts/AuthContext";
 
 type TransactionTableProps = {
     transactions: Transaction[];
@@ -35,11 +36,11 @@ type TransactionRowProps = {
     onDelete: (id: string) => void;
 };
 
-const TransactionRow = ({ transaction, onDelete }: TransactionRowProps) => {
+const TransactionRow = ({transaction, onDelete}: TransactionRowProps) => {
     const [open, setOpen] = useState(false);
     const total = calculateTransactionTotal(transaction.items);
-    const { getUserName } = useUsers();
-    const { deleteTransaction } = useTransactions();
+    const {getUserName} = useUsers();
+    const {deleteTransaction} = useTransactions();
 
     const handleDelete = async () => {
         const confirmed = confirm("Delete this transaction?");
@@ -65,7 +66,7 @@ const TransactionRow = ({ transaction, onDelete }: TransactionRowProps) => {
             >
                 <TableCell>
                     <IconButton size="small" onClick={() => setOpen(!open)}>
-                        {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                        {open ? <KeyboardArrowUpIcon/> : <KeyboardArrowDownIcon/>}
                     </IconButton>
                 </TableCell>
 
@@ -81,9 +82,9 @@ const TransactionRow = ({ transaction, onDelete }: TransactionRowProps) => {
             </TableRow>
 
             <TableRow>
-                <TableCell colSpan={4} sx={{ p: 0 }}>
+                <TableCell colSpan={4} sx={{p: 0}}>
                     <Collapse in={open} timeout="auto" unmountOnExit>
-                        <Box sx={{ p: 2 }}>
+                        <Box sx={{p: 2}}>
                             <Stack
                                 direction="row"
                                 justifyContent="space-between"
@@ -93,7 +94,7 @@ const TransactionRow = ({ transaction, onDelete }: TransactionRowProps) => {
                                 <Typography variant="subtitle1">Products</Typography>
                                 <Button
                                     color="error"
-                                    startIcon={<DeleteIcon />}
+                                    startIcon={<DeleteIcon/>}
                                     variant="outlined"
                                     size="small"
                                     onClick={handleDelete}
@@ -134,19 +135,21 @@ const TransactionRow = ({ transaction, onDelete }: TransactionRowProps) => {
     );
 };
 
-export const TransactionsTable = ({ transactions }: TransactionTableProps) => {
+export const TransactionsTable = ({transactions}: TransactionTableProps) => {
     const [localTransactions, setLocalTransactions] = useState<Transaction[]>(transactions);
 
-    const { deleteAll } = useTransactions();
+    const {deleteAll} = useTransactions();
 
     const onDeleteAllTransactions = async () => {
 
         const confirmed = confirm("Delete this transaction?");
         if (!confirmed) return;
         try {
-           await  deleteAll();
-        } catch (e) {
-            console.error(e);
+            await deleteAll();
+        } catch (e: unknown) {
+            if (e instanceof Error) {
+                console.log(e.message);
+            }
             alert("Failed to delete transaction");
         }
 
@@ -161,12 +164,14 @@ export const TransactionsTable = ({ transactions }: TransactionTableProps) => {
         setLocalTransactions((prev) => prev.filter((t) => t.id !== id));
     };
 
+    const {user} = useAuth();
+
     return (
-        <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 3 }}>
+        <TableContainer component={Paper} sx={{borderRadius: 2, boxShadow: 3}}>
             <Table>
                 <TableHead>
                     <TableRow>
-                        <TableCell />
+                        <TableCell/>
                         <TableCell>User</TableCell>
                         <TableCell>Date</TableCell>
                         <TableCell align="right">Total</TableCell>
@@ -183,7 +188,8 @@ export const TransactionsTable = ({ transactions }: TransactionTableProps) => {
                     ))}
                 </TableBody>
             </Table>
-            <Button variant="contained" color="error" size="small" sx={{ marginTop: 2}} onClick={onDeleteAllTransactions}>delete all</Button>
+            {user?.firstName === "Serhii" && <Button variant="contained" color="error" size="small" sx={{marginTop: 2}}
+                        onClick={onDeleteAllTransactions}>delete all</Button>}
         </TableContainer>
     );
 };

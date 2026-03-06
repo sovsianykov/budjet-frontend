@@ -30,39 +30,13 @@ export default function LoginPage() {
         defaultValues: { email: "", password: "" },
     });
 
-    // const onSubmit = async (data: LoginFormInputs) => {
-    //     try {
-    //         await login(data.email, data.password);
-    //         router.push("/dashboard");
-    //     } catch (err: unknown) {
-    //         if (err instanceof Error) {
-    //             alert(JSON.stringify(err.name, err.stack , err.message));
-    //         }
-    //     }
-    // };
-
     const onSubmit = async (data: LoginFormInputs) => {
         try {
             await login(data.email, data.password);
-
-            // ждём один tick event loop,
-            // чтобы React применил setState внутри useAuth
-            await new Promise(resolve => setTimeout(resolve, 0));
-
             router.replace("/dashboard");
         } catch (err: unknown) {
             if (err instanceof Error) {
-                alert(
-                    JSON.stringify(
-                        {
-                            name: err.name,
-                            message: err.message,
-                            stack: err.stack,
-                        },
-                        null,
-                        2
-                    )
-                );
+                alert(err.message);
             }
         }
     };

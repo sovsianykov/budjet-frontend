@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /Users/applestock/Documents/work/tutorials/budget/budjet-frontend/src/app/\\\\[lang\\\\] -type f)",
+      "Bash(pnpm build 2>&1 | tail -30)",
+      "Bash(pnpm build 2>&1 | tail -20)",
+      "Bash(git commit -m \"$\\(cat <<'EOF'\nfix auth: switch to httpOnly cookie-based authentication\n\nRemove token management from client \\(localStorage, Tokens type, _tokens param\\).\nAuth now relies on httpOnly cookies with credentials: \"include\".\nRestore session check via fetchMe\\(\\) on app start, enable route guards,\nremove hardcoded mockUser.\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>\nEOF\n\\)\")"
+    ]
+  }
+}

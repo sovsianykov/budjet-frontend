@@ -43,7 +43,7 @@ export const CreateTransactionForm = () => {
             .filter(i => i.productId && i.quantity > 0)
             .map(i => ({
                 ...i,
-                quantity: Number(i.quantity), // 🔥 конвертируем к числу
+                quantity: Number(i.quantity),
             }));
 
         if (!items.length) {

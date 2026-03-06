@@ -27,7 +27,7 @@ export const ProductSelectDropdown = ({control, name, products,}: Props) => {
                 >
                     {products.map((product) => (
                         <MenuItem key={product.id} value={product.id}>
-                            {product.productName} — ${product.price.toFixed(2)}
+                            {product.productName} — {product.price.toFixed(2)}
                         </MenuItem>
                     ))}
                 </TextField>
