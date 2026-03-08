@@ -33,7 +33,14 @@ export async function apiRequest<T>(
         fetchOptions.body = JSON.stringify(body);
     }
 
-    const res = await fetch(`${config.baseApiUrl}${endpoint}`, fetchOptions);
+    const baseUrl = config.baseApiUrl;
+    if (!baseUrl) {
+        throw new ApiError(
+            "NEXT_PUBLIC_API_URL is not configured. Create a .env.local file with this variable.",
+        );
+    }
+
+    const res = await fetch(`${baseUrl}${endpoint}`, fetchOptions);
 
     if (!res.ok) {
         const errData = await res.json().catch(() => ({}));

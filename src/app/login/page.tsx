@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useForm, Controller } from "react-hook-form";
@@ -11,6 +12,7 @@ import {
     Typography,
     Container,
     Paper,
+    CircularProgress,
 } from "@mui/material";
 
 type LoginFormInputs = {
@@ -19,7 +21,7 @@ type LoginFormInputs = {
 };
 
 export default function LoginPage() {
-    const { login } = useAuth();
+    const { login, isAuthenticated, isLoading } = useAuth();
     const router = useRouter();
 
     const {
@@ -29,6 +31,24 @@ export default function LoginPage() {
     } = useForm<LoginFormInputs>({
         defaultValues: { email: "", password: "" },
     });
+
+    useEffect(() => {
+        if (!isLoading && isAuthenticated) {
+            router.replace("/dashboard");
+        }
+    }, [isLoading, isAuthenticated, router]);
+
+    if (isLoading) {
+        return (
+            <Box sx={{ height: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <CircularProgress />
+            </Box>
+        );
+    }
+
+    if (isAuthenticated) {
+        return null;
+    }
 
     const onSubmit = async (data: LoginFormInputs) => {
         try {

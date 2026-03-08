@@ -4,40 +4,62 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Budget/grocery management web app built with Next.js 16 (App Router), TypeScript, Material-UI, and Tailwind CSS v4.
+Budget/grocery management frontend built with **Next.js 16**, **React 19**, **TypeScript**, and **Material-UI 7**. Uses httpOnly cookie-based authentication with a backend API.
 
 ## Commands
 
 ```bash
-pnpm dev          # Start dev server
-pnpm build        # Production build
-pnpm start        # Start production server
-pnpm lint         # Run ESLint (flat config, ESLint 9)
+pnpm dev        # Start development server
+pnpm build      # Production build
+pnpm lint       # ESLint
+pnpm start      # Start production server
 ```
 
-Package manager is **pnpm** (v9.12.1). No test framework is configured.
+Package manager: **pnpm** (v9.12.1)
 
 ## Architecture
 
-**Routing:** Next.js App Router (`src/app/`). Some routes use a `[lang]` dynamic segment for i18n (products, transactions, create-product).
+### Routing (Next.js App Router)
 
-**Authentication:** Custom `useAuth()` hook manages auth state. Tokens are stored as HTTP-only cookies (server-set); only `userId` is persisted in localStorage. The API wrapper (`src/lib/api.ts`) sends `credentials: "include"` on all requests.
+- `src/app/` — App Router with `[lang]` dynamic segment for i18n
+- Protected routes: `/dashboard/*` (middleware checks `accessToken` cookie)
+- Auth routes: `/login`, `/register`
+- Data routes: `/{lang}/products`, `/{lang}/transactions`, `/{lang}/create-product`
+- Root `/` redirects based on auth state
 
-**API Layer:** `apiRequest<T>()` in `src/lib/api.ts` is the central fetch wrapper. Domain-specific API functions live in `src/lib/products.ts`, `src/lib/transactions.ts`, `src/lib/users.ts`. Backend base URL comes from `NEXT_PUBLIC_API_URL` env var (default: `http://localhost:8080/api/v1`).
+### API Layer
 
-**State Management:** Custom hooks (`useAuth`, `useProducts`, `useTransactions`) using `useState`/`useCallback`. TanStack React Query is installed but not yet actively used. React Hook Form with Zod handles form state and validation.
+- `src/lib/api.ts` — `apiRequest<T>()` generic fetch wrapper; always sends `credentials: "include"` for cookie auth
+- `src/lib/products.ts`, `transactions.ts`, `users.ts` — endpoint-specific functions
+- Custom `ApiError` class with status code and response data
+- Base URL from `NEXT_PUBLIC_API_URL` env var
 
-**Styling:** Three systems coexist — Material-UI components (primary UI), Tailwind CSS v4 (utility classes), and Sass modules (component-scoped styles like `dashboard.module.scss`). MUI theme is configured in `src/app/providers.tsx`.
+### State & Data
 
-## Key Path Aliases
+- **Auth:** React Context (`src/contexts/AuthContext.tsx`) — login, register, logout, fetchMe; stores only `userId` in localStorage, tokens in httpOnly cookies
+- **Data hooks** (`src/hooks/`): `useProducts`, `useTransactions`, `useUsers` — each manages its own state with loading/error, auto-fetches on mount
+- **TanStack React Query** is installed but hooks currently use manual state management
 
-`@/*` maps to `./src/*` (configured in tsconfig.json).
+### Styling
 
-## Types
+- **Tailwind CSS 4** via PostCSS + **MUI theme** (defined in `src/app/providers.tsx`)
+- SCSS modules for page-specific styles (e.g., `dashboard.module.scss`)
+- MUI `sx` prop for component-level styling
 
-- `src/types/auth.ts` — User, Tokens, LoginRequest, RegisterPayload, Role
-- `src/types/types.ts` — Product, Transaction, TransactionItem, PageParamsWithLang
+### Key Patterns
+
+- All interactive components use `"use client"` directive
+- Forms: `react-hook-form` with MUI `TextField` and `Controller`
+- Validation: Zod schemas
+- Animations: Framer Motion (swipeable product cards with drag gestures)
+- Tables: MUI Table with collapsible rows, confirmation dialogs for deletes
+
+### Path Alias
+
+`@/*` maps to `./src/*` (configured in tsconfig.json)
 
 ## Environment Variables
 
-Defined in `.env`: `NEXT_PUBLIC_API_URL`, `STORAGE_KEY`, and several `NEXT_PUBLIC_CONTENTFUL_*` variables for Contentful CMS integration.
+- `NEXT_PUBLIC_API_URL` — Backend API base URL
+- `STORAGE_KEY` — localStorage key prefix (defaults to "key")
+- Contentful CMS keys: `CONTENTFUL_SPACE_ID`, `CONTENTFUL_ACCESS_TOKEN`, etc. (see `src/config/config.ts`)

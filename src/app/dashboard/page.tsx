@@ -1,19 +1,31 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Sidebar from "../../components/Sidebar/Sidebar";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, CircularProgress } from "@mui/material";
 import { useAuth } from "@/hooks/useAuth";
 import styles from './dashboard.module.scss'
-import {redirect} from "next/navigation";
 
 export default function DashboardPage() {
     const { isLoading, isAuthenticated, user } = useAuth();
+    const router = useRouter();
 
-    if (isLoading) return null;
-    if (!isAuthenticated) redirect('/login');
+    useEffect(() => {
+        if (!isLoading && !isAuthenticated) {
+            router.replace("/login");
+        }
+    }, [isLoading, isAuthenticated, router]);
 
+    if (isLoading) {
+        return (
+            <Box sx={{ height: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <CircularProgress />
+            </Box>
+        );
+    }
 
-    console.log(user)
+    if (!isAuthenticated) return null;
 
     return (
         <Box display="flex" color='gray' bgcolor='white' className={styles.fullscreenDashboardBg}>

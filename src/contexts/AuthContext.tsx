@@ -124,11 +124,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             );
 
             const parsed = extractUser(data);
-            if (parsed) {
-                setUser(parsed);
-                setUserId(parsed.id);
-                saveUserId(parsed.id);
-            }
+            if (!parsed) throw new Error("Unexpected response from server");
+            setUser(parsed);
+            setUserId(parsed.id);
+            saveUserId(parsed.id);
         } finally {
             setIsLoading(false);
         }
@@ -144,11 +143,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             );
 
             const parsed = extractUser(data);
-            if (parsed) {
-                setUser(parsed);
-                setUserId(parsed.id);
-                saveUserId(parsed.id);
-            }
+            if (!parsed) throw new Error("Unexpected response from server");
+            setUser(parsed);
+            setUserId(parsed.id);
+            saveUserId(parsed.id);
         } finally {
             setIsLoading(false);
         }

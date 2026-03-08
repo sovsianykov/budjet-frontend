@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
@@ -11,6 +12,7 @@ import {
     Button,
     Typography,
     Box,
+    CircularProgress,
 } from "@mui/material";
 
 type RegisterForm = {
@@ -22,7 +24,7 @@ type RegisterForm = {
 };
 
 export default function RegisterPage() {
-    const { register: registerUser } = useAuth();
+    const { register: registerUser, isAuthenticated, isLoading } = useAuth();
     const router = useRouter();
 
     const {
@@ -39,10 +41,33 @@ export default function RegisterPage() {
         },
     });
 
+    useEffect(() => {
+        if (!isLoading && isAuthenticated) {
+            router.replace("/dashboard");
+        }
+    }, [isLoading, isAuthenticated, router]);
+
+    if (isLoading) {
+        return (
+            <Box sx={{ height: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <CircularProgress />
+            </Box>
+        );
+    }
+
+    if (isAuthenticated) {
+        return null;
+    }
 
     const onSubmit = async (data: RegisterForm) => {
-        await registerUser(data);
-        router.replace("/dashboard");
+        try {
+            await registerUser(data);
+            router.replace("/dashboard");
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                alert(err.message);
+            }
+        }
     };
 
     return (
