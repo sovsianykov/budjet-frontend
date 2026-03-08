@@ -40,7 +40,8 @@ export async function apiRequest<T>(
         );
     }
 
-    const res = await fetch(`${baseUrl}${endpoint}`, fetchOptions);
+    const url = `${baseUrl.replace(/\/+$/, '')}${endpoint}`;
+    const res = await fetch(url, fetchOptions);
 
     if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
