@@ -56,7 +56,11 @@ export default function RegisterPage() {
     }
 
     if (isAuthenticated) {
-        return null;
+        return (
+            <Box sx={{ height: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <CircularProgress />
+            </Box>
+        );
     }
 
     const onSubmit = async (data: RegisterForm) => {
