@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Box, Typography, Button, Container, Paper } from "@mui/material";
+import { Typography, Button, Container, Paper } from "@mui/material";
 
 export default function NotFound() {
     const router = useRouter();

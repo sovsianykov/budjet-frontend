@@ -44,7 +44,7 @@ export interface Transaction {
     items: TransactionItem[];
 }
 
-export interface PageParamsWithLang<T = {}> {
+export interface PageParamsWithLang<T = Record<string, never>> {
     params: {
         lang: string;
     } & T;

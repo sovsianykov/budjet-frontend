@@ -115,7 +115,7 @@ export const CreateTransactionForm = () => {
                         <IconButton
                             color="error"
                             onClick={() => remove(index)}
-                            sx={{ width: 30 }}
+                            sx={{ width: 30}}
                             disabled={fields.length === 1}
                         >
                             <Remove />

@@ -10,7 +10,7 @@ type Props = {
     products: Product[];
 };
 
-export const ProductSelectDropdown = ({control, name, products,}: Props) => {
+export const ProductSelectDropdown = ({control, name, products}: Props) => {
     return (
         <Controller
             name={name}
@@ -20,6 +20,11 @@ export const ProductSelectDropdown = ({control, name, products,}: Props) => {
                 <TextField
                     {...field}
                     select
+                    slotProps={{
+                        select: {
+                            IconComponent: () => null,
+                        },
+                    }}
                     label="Enter a product name"
                     error={!!fieldState.error}
                     helperText={fieldState.error?.message}

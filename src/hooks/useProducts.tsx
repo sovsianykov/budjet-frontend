@@ -25,8 +25,10 @@ export function useProducts({ autoLoad = true }: UseProductsOptions = {}) {
             setError(null);
             const data = await getProducts();
             setProducts(data);
-        } catch (e: any) {
-            setError(e.message);
+        } catch (e: unknown) {
+            if (e instanceof Error) {
+                setError(e.message);
+            }
         } finally {
             setLoading(false);
         }

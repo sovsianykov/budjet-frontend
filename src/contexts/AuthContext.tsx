@@ -68,7 +68,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 /* ---------------------------------- */
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
-    const [userId, setUserId] = useState<string | null>(readUserId());
+    const [userId, setUserId] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     /* ---- fetch current user (me) ---- */
@@ -111,6 +111,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     /* ---- session restore on app start ---- */
     useEffect(() => {
+        const storedUserId = readUserId();
+        if (storedUserId) {
+            setUserId(storedUserId);
+        }
         fetchMe().finally(() => setIsLoading(false));
     }, [fetchMe]);
 
